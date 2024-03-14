@@ -12,14 +12,18 @@ import java.util.ArrayList;
 public class DBServer {
 
     private static final char END_OF_TRANSMISSION = 4;
-    private String storageFolderPath;
-    public ArrayList<Table> tables;
+    static private String storageFolderPath;
+    static private ArrayList<Table> tables;
 
     public static void main(String args[]) throws IOException {
         DBServer server = new DBServer();
-        server.blockingListenOn(8888);
-        tables = new ArrayList<tables>();
+        System.out.println("Time to Read from:" + storageFolderPath);
+        tables = new ArrayList<Table>();
         readAllIn(tables);
+        for(Table table : tables){
+            System.out.print(table.getTableAsString());
+        }
+        server.blockingListenOn(8888);
     }
 
     /**
@@ -35,42 +39,30 @@ public class DBServer {
         }
     }
 
-    public void readAllIn(ArrayList<Table>[] tables){
+    static public void readAllIn(ArrayList<Table> tables) throws IOException {
         File Databases = new File(storageFolderPath);
         File[] FilesList = Databases.listFiles();
         if(FilesList!=null){
             for(File file : FilesList) {
-                readFile(file,tables);
+                if(file.isFile()){
+                    readFile(file,tables);
+                }
             }
         }
     }
 
-    private void readFile(File file,ArrayList<Table>[] tables){
+    static private void readFile(File file,ArrayList<Table> tables) throws IOException {
         if(file!=null) {
+            BufferedReader buffReader;
             try {
                 FileReader reader = new FileReader(file);
-                BufferedReader buffReader = new BufferedReader(reader);
+                buffReader = new BufferedReader(reader);
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
-                return;
             }
-            Table newTable = new Table(buffReader);
-
-
-            tables.add(newTable);
+            tables.add(new Table(buffReader,file.getName()));
         }
     }
-
-
-
-
-
-
-
-
-
-
-
 
 
 
