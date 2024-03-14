@@ -9,7 +9,7 @@ import java.util.Arrays;
 public class Table {
     private int numberOfRows;
     private int numberOfColumns;
-    private String[] columnNames;
+    public String[] columnNames;
     private int colNamesSize;
     private BufferedReader buffReader;
     private ArrayList<DataRow> DataList;
@@ -24,6 +24,9 @@ public class Table {
         colNamesSize = 10;
         columnNames = new String[colNamesSize];
         TableAsString = "";
+    }
+    public String getName(){
+        return TableName;
     }
     public void createTableFromFiles(BufferedReader inpBuffReader) throws IOException {
         buffReader = inpBuffReader;

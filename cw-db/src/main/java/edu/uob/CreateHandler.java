@@ -1,6 +1,7 @@
 package edu.uob;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class CreateHandler implements Handler{
     private ArrayList<String> tokens;
@@ -12,10 +13,10 @@ public class CreateHandler implements Handler{
     public void IncrementToken(){
         ActiveToken = tokens.get(++CurrentToken);
     }
-    public boolean handleCreate(){
+    public boolean handleCreate() {
         CurrentToken = 0;
         IncrementToken();
-        switch(checkDataType()){
+        switch (checkDataType()) {
             case 1:
                 createDatabase();
                 break;
@@ -25,15 +26,37 @@ public class CreateHandler implements Handler{
             default:
                 return false;
         }
+        IncrementToken();
+        if (ActiveToken.equals(";")) {
+            return true;
+        } else if (ActiveToken.equals("(")) {
+            if(!makeTableTitles()){return false;}
+            IncrementToken();
+            return ActiveToken.equals(";");
+        }
         return false;
     }
-    private boolean createDatabase(){
+    private boolean makeTableTitles(){
+        IncrementToken();
+        if(!isAttribute()){return false;}
+        IncrementToken();
+        if(ActiveToken.equals(",")){return makeTableTitles();}
+        return ActiveToken.equals(")");
+    }
+    private boolean isAttribute(){
+        for(int i=0;i<ActiveToken.length();i++){
+            char c = ActiveToken.charAt(i);
+            if(!(Character.isAlphabetic(c)||Character.isDigit(c))){
+                return false;
+            }
+        }
+        return true;
+    }
+    private void createDatabase(){
         DBServer.databases.add(new Database(ActiveToken));
-        return false;
     }
-    private boolean createTable(){
+    private void createTable(){
         DBServer.activeDatabase.tables.add(new Table(ActiveToken));
-        return false;
     }
     private int checkDataType(){
         if(ActiveToken.equals("DATABASE")){
