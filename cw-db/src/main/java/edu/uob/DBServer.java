@@ -13,19 +13,38 @@ public class DBServer {
 
     private static final char END_OF_TRANSMISSION = 4;
     static private String storageFolderPath;
-    static private ArrayList<Table> tables;
-
+    static public ArrayList<Database> databases;
+    static private CommandHandler handler;
+    static public Database activeDatabase;
     public static void main(String args[]) throws IOException {
         DBServer server = new DBServer();
-        System.out.println("Time to Read from:" + storageFolderPath);
-        tables = new ArrayList<Table>();
-        readAllIn(tables);
-        for(Table table : tables){
-            System.out.print(table.getTableAsString());
+        databases = new ArrayList<Database>();
+        setupDatabases();
+        for(Database database : databases){
+            for(Table table : database.tables){
+                System.out.print(table.getTableAsString());
+            }
         }
+        if(!databases.isEmpty()) {
+            activeDatabase = databases.get(0);
+        }
+        handler = new CommandHandler();
         server.blockingListenOn(8888);
     }
 
+    static void setupDatabases() throws IOException {
+        File Databases = new File(storageFolderPath);
+        File[] FilesList = Databases.listFiles();
+        if(FilesList!=null){
+            for(File file : FilesList) {
+                if(file.isDirectory()){
+                    Database newDatabase = new Database(file.getName());
+                    databases.add(newDatabase);
+                    newDatabase.createDatabaseFromFiles(file);
+                }
+            }
+        }
+    }
     /**
     * KEEP this signature otherwise we won't be able to mark your submission correctly.
     */
@@ -39,37 +58,6 @@ public class DBServer {
         }
     }
 
-    static public void readAllIn(ArrayList<Table> tables) throws IOException {
-        File Databases = new File(storageFolderPath);
-        File[] FilesList = Databases.listFiles();
-        if(FilesList!=null){
-            for(File file : FilesList) {
-                if(file.isFile()){
-                    readFile(file,tables);
-                }
-            }
-        }
-    }
-
-    static private void readFile(File file,ArrayList<Table> tables) throws IOException {
-        if(file!=null) {
-            BufferedReader buffReader;
-            try {
-                FileReader reader = new FileReader(file);
-                buffReader = new BufferedReader(reader);
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-            tables.add(new Table(buffReader,file.getName()));
-        }
-    }
-
-
-
-
-
-
-
     /**
     * KEEP this signature (i.e. {@code edu.uob.DBServer.handleCommand(String)}) otherwise we won't be
     * able to mark your submission correctly.
@@ -78,6 +66,7 @@ public class DBServer {
     */
     public String handleCommand(String command) {
         // TODO implement your server logic here
+        handler.handleNewCommand(command);
         return "";
     }
 

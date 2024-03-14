@@ -16,26 +16,22 @@ public class Table {
     private String TableName;
     private String TableAsString;
     //linked list....
-    Table(BufferedReader inpBuffReader,String Name) throws IOException {
+    Table(String Name){
         TableName = Name;
-        System.out.println(Name);
-        buffReader = inpBuffReader;
-        String firstLine;
         numberOfColumns = 0;
         numberOfRows = 0;
         DataList = new ArrayList<DataRow>();
         colNamesSize = 10;
         columnNames = new String[colNamesSize];
         TableAsString = "";
-        try{
-            firstLine = buffReader.readLine();
-        }catch(Exception EmptyFile){
-            return;
-        }
-        makeColumns(firstLine);
+    }
+    public void createTableFromFiles(BufferedReader inpBuffReader) throws IOException {
+        buffReader = inpBuffReader;
+        makeColumns(buffReader.readLine());
         readData();
-        System.out.println("Table Read In\n");
-
+    }
+    public String getTableName(){
+        return TableName;
     }
 
     private void makeColumns(String firstLine){
@@ -43,8 +39,8 @@ public class Table {
         char currentChar;
         if(firstLine==null){
             throw new RuntimeException("ERROR : Read empty file\n");
-
         }
+
         for(int i=0;i<firstLine.length();i++){
             currentChar = firstLine.charAt(i);
             if (currentChar != '\t') {
@@ -73,14 +69,22 @@ public class Table {
             if(nextLine == null){
                 return;
             }
-            DataRow newRow = new DataRow(nextLine,numberOfColumns);
-            TableAsString += newRow.getDataRowAsString();
-            DataList.add(newRow);
-            numberOfRows++;
+            AddRow(nextLine);
         }
+    }
+    private void AddRow(String Input){
+        DataRow newRow = new DataRow(Input,numberOfColumns);
+        TableAsString += newRow.getDataRowAsString();
+        DataList.add(newRow);
+        numberOfRows++;
     }
     public String getTableAsString(){
         return TableAsString;
     }
-
+    public void InsertNewRow(String Input){
+        AddRow(Input);
+    }
+    private void RemoveRow(DataRow row){
+        DataList.remove(row);
+    }
 }
