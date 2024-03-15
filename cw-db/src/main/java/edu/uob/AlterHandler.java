@@ -35,7 +35,7 @@ public class AlterHandler implements Handler{
                         return false;
                     }
                 }
-                activeTable.addCollumn(ActiveToken);
+                activeTable.addColumn(ActiveToken);
                 return true;
             case 2:
                 for (String title : activeTable.columnNames) {

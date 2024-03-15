@@ -28,6 +28,31 @@ public class Table {
     public String getName(){
         return TableName;
     }
+    public void addColumn(String title){
+        columnNames[colNamesSize++] = title;
+        for(DataRow datarow : DataList){
+            datarow.addValue("");
+        }
+    }
+    public void removeColumn(String title){
+        for(int i=0;i<colNamesSize;i++){
+            String colName = columnNames[i];
+            if(colName.equals(title)){
+                removeFromList(columnNames,i,colNamesSize--);
+                removeDataPoints(i);
+            }
+        }
+    }
+    private void removeDataPoints(int i){
+        for(DataRow datarow : DataList){
+            datarow.removeValue(i);
+        }
+    }
+    private void removeFromList(String[] list, int i,int listSize){
+        while(i<listSize){
+            list[i++] = list[i+1];
+        }
+    }
     public void createTableFromFiles(BufferedReader inpBuffReader) throws IOException {
         buffReader = inpBuffReader;
         makeColumns(buffReader.readLine());

@@ -13,6 +13,15 @@ public class DataRow {
         MakeRow(Input);
         CheckSize(DesiredSize);
     }
+    public void addValue(String datapoint){
+        DataPoints[size++] = datapoint;
+    }
+    public void removeValue(int i){
+        while(i<size){
+            DataPoints[i++] = DataPoints[i+1];
+        }
+        size--;
+    }
 
     private void MakeRow(String Input){
         String datapoint = "";
