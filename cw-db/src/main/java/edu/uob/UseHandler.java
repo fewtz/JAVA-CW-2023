@@ -2,16 +2,12 @@ package edu.uob;
 
 import java.util.ArrayList;
 
-public class UseHandler implements Handler{
-    private ArrayList<String> tokens;
-    private int CurrentToken;
-    private String ActiveToken;
+public class UseHandler extends Handler{
+
     UseHandler(ArrayList<String> Input){
         tokens = Input;
     }
-     public void IncrementToken(){
-        ActiveToken = tokens.get(++CurrentToken);
-    }
+
     public boolean handleUse(){
         CurrentToken = 0;
         IncrementToken();

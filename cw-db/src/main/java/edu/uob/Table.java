@@ -1,10 +1,10 @@
 package edu.uob;
 
-import javax.xml.crypto.Data;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+
 
 public class Table {
     private int numberOfRows;
@@ -43,6 +43,9 @@ public class Table {
             }
         }
     }
+    public void insertValues(String values){
+        DataList.add(new DataRow(values,numberOfColumns));
+    }
     private void removeDataPoints(int i){
         for(DataRow datarow : DataList){
             datarow.removeValue(i);
@@ -60,6 +63,13 @@ public class Table {
     }
     public String getTableName(){
         return TableName;
+    }
+
+    public int getNumberOfRows() {
+        return numberOfRows;
+    }
+    public int getNumberOfColumns() {
+        return numberOfColumns;
     }
 
     private void makeColumns(String firstLine){

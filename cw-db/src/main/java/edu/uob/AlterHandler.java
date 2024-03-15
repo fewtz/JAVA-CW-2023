@@ -2,17 +2,10 @@ package edu.uob;
 
 import java.util.ArrayList;
 
-public class AlterHandler implements Handler{
-    private ArrayList<String> tokens;
-    private int CurrentToken;
-    private String ActiveToken;
-    private Table activeTable;
+public class AlterHandler extends Handler{
     private int AlterationType;
     AlterHandler(ArrayList<String> Input){
         tokens = Input;
-    }
-    public void IncrementToken(){
-        ActiveToken = tokens.get(++CurrentToken);
     }
     public boolean handleAlter(){
         CurrentToken=0;
@@ -55,14 +48,5 @@ public class AlterHandler implements Handler{
             case "DROP" -> 2;
             default -> 0;
         };
-    }
-    private boolean isTable(){
-        for(Table table : DBServer.activeDatabase.tables){
-            if(ActiveToken.equals(table.getName())){
-                activeTable = table;
-                return true;
-            }
-        }
-        return false;
     }
 }

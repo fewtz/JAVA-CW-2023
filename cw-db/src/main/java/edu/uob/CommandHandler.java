@@ -23,6 +23,22 @@ public class CommandHandler {
                 CreateHandler chandler = new CreateHandler(tokens);
                 isSuccess = chandler.handleCreate();
                 break;
+            case 3:
+                DropHandler dhandler = new DropHandler(tokens);
+                isSuccess = dhandler.handleDrop();
+                break;
+            case 4:
+                AlterHandler ahandler = new AlterHandler(tokens);
+                isSuccess = ahandler.handleAlter();
+                break;
+            case 5:
+                InsertHandler ihandler = new InsertHandler(tokens);
+                isSuccess = ihandler.handleInsert();
+                break;
+            case 6:
+                SelectHandler shandler = new SelectHandler(tokens);
+                isSuccess = shandler.handleSelect();
+                break;
             default:
                 isSuccess =false;
                 System.out.println("Unknown Command");

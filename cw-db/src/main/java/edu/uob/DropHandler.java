@@ -3,17 +3,10 @@ package edu.uob;
 import javax.xml.crypto.Data;
 import java.util.ArrayList;
 
-public class DropHandler implements Handler {
-    private ArrayList<String> tokens;
-    private int CurrentToken;
-    private String ActiveToken;
+public class DropHandler extends Handler {
     DropHandler(ArrayList<String> Input){
         tokens = Input;
     }
-    public void IncrementToken(){
-        ActiveToken = tokens.get(++CurrentToken);
-    }
-
     public boolean handleDrop(){
         CurrentToken = 0;
         IncrementToken();

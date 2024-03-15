@@ -3,15 +3,9 @@ package edu.uob;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class CreateHandler implements Handler{
-    private ArrayList<String> tokens;
-    private int CurrentToken;
-    private String ActiveToken;
+public class CreateHandler extends Handler{
     CreateHandler(ArrayList<String> Input){
         tokens = Input;
-    }
-    public void IncrementToken(){
-        ActiveToken = tokens.get(++CurrentToken);
     }
     public boolean handleCreate() {
         CurrentToken = 0;
@@ -27,8 +21,7 @@ public class CreateHandler implements Handler{
                 return false;
         }
         IncrementToken();
-        if (ActiveToken.equals(";")) {
-            return true;
+        if (ActiveToken.equals(";")) {return true;
         } else if (ActiveToken.equals("(")) {
             if(!makeTableTitles()){return false;}
             IncrementToken();
@@ -38,19 +31,10 @@ public class CreateHandler implements Handler{
     }
     private boolean makeTableTitles(){
         IncrementToken();
-        if(!isAttribute()){return false;}
+        if(!isPlainText()){return false;}
         IncrementToken();
         if(ActiveToken.equals(",")){return makeTableTitles();}
         return ActiveToken.equals(")");
-    }
-    private boolean isAttribute(){
-        for(int i=0;i<ActiveToken.length();i++){
-            char c = ActiveToken.charAt(i);
-            if(!(Character.isAlphabetic(c)||Character.isDigit(c))){
-                return false;
-            }
-        }
-        return true;
     }
     private void createDatabase(){
         DBServer.databases.add(new Database(ActiveToken));
