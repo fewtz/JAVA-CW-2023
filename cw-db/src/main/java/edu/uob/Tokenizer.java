@@ -9,6 +9,7 @@ public class Tokenizer {
         command = Input;
     }
     public ArrayList<String> tokenize() throws IndexOutOfBoundsException{
+        tokens = new ArrayList<String>();
         String tempToken="";
         char currentChar;
         int currentCharPlace=0;

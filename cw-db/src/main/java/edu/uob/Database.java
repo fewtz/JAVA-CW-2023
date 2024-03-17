@@ -12,6 +12,7 @@ public class Database {
         Name = inputName;
     }
     public void createDatabaseFromFiles(File Input) throws IOException {
+        tables = new ArrayList<Table>();
         File[] FilesList = Input.listFiles();
         if(FilesList[0]!=null) {
             for (File file : FilesList) {

@@ -39,6 +39,10 @@ public class CommandHandler {
                 SelectHandler shandler = new SelectHandler(tokens);
                 isSuccess = shandler.handleSelect();
                 break;
+            case 10:
+                ConditionHandler conditionHandler = new ConditionHandler(tokens);
+                isSuccess = conditionHandler.parseConditions();
+                break;
             default:
                 isSuccess =false;
                 System.out.println("Unknown Command");
@@ -59,6 +63,7 @@ public class CommandHandler {
             case "UPDATE" -> 7;
             case "DELETE" -> 8;
             case "JOIN" -> 9;
+            case "CONDITION" -> 10;
             default -> 0;
         };
     }
