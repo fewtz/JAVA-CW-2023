@@ -11,6 +11,7 @@ public class ConditionHandler extends Handler{
         CLOSEBRACKET,
     };
     String parsingToken;
+    int ReturnVal;
     ArrayList<ConditionComponent> conditionList;
     int placeInConditionList=0;
     int currentParsingToken;
@@ -47,43 +48,51 @@ public class ConditionHandler extends Handler{
     }
 
     private boolean parseCondition(int currentComponent){
-        boolean testing,testing2,testing3;
-        testing =parseComboCondition(currentComponent);
+        int testing,testing2,testing3;
+        testing = parseComboCondition(currentComponent);
         testing2 = parseOpenBracket(currentComponent);
         testing3 = parseExpression(currentComponent);
-
-        if(!(testing||testing2||testing3)){return false;}
-        return furthestComponent+1==numberOfCompoents && inUseBrackets==0;
+        if(testing<0 && testing2<0 && testing3<0){return false;}
+        return furthestComponent+1>=numberOfCompoents && inUseBrackets==0;
     }
-    private boolean parseOpenBracket(int currentComponent){
-        currentComponent = IncrementConditionList(currentComponent);
-        if(currentComponent<0){return false;}
-        if(activeComponent!=ConditionComponent.OPENBRACKET){return false;}
-        currentComponent = IncrementConditionList(currentComponent);
-        if(currentComponent<0){return false;}
-        if(parseOpenBracket(currentComponent-1)){activeComponent==ConditionComponent.CLOSEBRACKET;}
-        if(!(parseComboCondition(currentComponent-1)||parseExpression(currentComponent-1))){return false;}
-        currentComponent = IncrementConditionList(currentComponent);
-        if(currentComponent<0){return false;}
-        return activeComponent==ConditionComponent.CLOSEBRACKET;
+    private int parseOpenBracket(int currentComponent){
+        if((currentComponent = IncrementConditionList(currentComponent))<0){return -1;}
+        if(activeComponent!=ConditionComponent.OPENBRACKET){return -1;}
+        if((currentComponent = IncrementConditionList(currentComponent))<0){return -1;}
+        if((ReturnVal = parseComboCondition(currentComponent-1))>0){
+            currentComponent = ReturnVal;
+        }else{
+            if((ReturnVal = parseOpenBracket(currentComponent-1))>0){
+                currentComponent = ReturnVal;
+            }else{
+                if((ReturnVal = parseExpression(currentComponent-1))>0){
+                    currentComponent = ReturnVal;
+                }else{
+                    return -1;
+                }
+            }
+        }
+        if((currentComponent = IncrementConditionList(currentComponent))<0){return -1;}
+        if(activeComponent!=ConditionComponent.CLOSEBRACKET){return -1;}
+        else{return currentComponent;}
     }
-    private boolean parseComboCondition(int currentComponent){
-        currentComponent = IncrementConditionList(currentComponent);
-        if(currentComponent<0){return false;}
-        if(parseOpenBracket(currentComponent-1)){return true;}
-        if(!(parseExpression(currentComponent-1))){return false;}
-        System.out.println("yes " + activeComponent);
-        currentComponent = IncrementConditionList(currentComponent);
-        if(currentComponent<0){return false;}
-        if(activeComponent!=ConditionComponent.BOOLEANOPERATOR){return false;}
-        System.out.println("yes " + activeComponent);
-        currentComponent = IncrementConditionList(currentComponent);
-        if(currentComponent<0){return false;}
-        return parseExpression(currentComponent-1);
+    private int parseComboCondition(int currentComponent){
+        if((currentComponent = IncrementConditionList(currentComponent))<0){return -1;}
+        if((ReturnVal = parseOpenBracket(currentComponent-1))>0){currentComponent = ReturnVal;}
+        else if((ReturnVal = parseExpression(currentComponent-1))>0){currentComponent = ReturnVal;}
+        else{return -1;}
+        if((currentComponent = IncrementConditionList(currentComponent))<0){return -1;}
+        if(activeComponent!=ConditionComponent.BOOLEANOPERATOR){return -1;}
+        if((currentComponent = IncrementConditionList(currentComponent))<0){return -1;}
+        if((ReturnVal = parseOpenBracket(currentComponent-1))>0){currentComponent = ReturnVal;}
+        else if((ReturnVal = parseExpression(currentComponent-1))>0){currentComponent = ReturnVal;}
+        else{return -1;}
+        return ReturnVal;
     }
-    private boolean parseExpression(int currentComponent){
+    private int parseExpression(int currentComponent){
         IncrementConditionList(currentComponent);
-        return activeComponent==ConditionComponent.EXPRESSION;
+        if(activeComponent!=ConditionComponent.EXPRESSION){return -1;}
+        else{return currentComponent+1;}
     }
     public int IncrementConditionList(int currentComponent){
         if(currentComponent>=furthestComponent){furthestComponent=currentComponent;}
