@@ -7,18 +7,19 @@ public class AlterHandler extends Handler{
     AlterHandler(ArrayList<String> Input){
         tokens = Input;
     }
-    public boolean handleAlter(){
+    public String handleAlter(){
         CurrentToken=0;
         IncrementToken();
-        if(!ActiveToken.equals("TABLE")){return false;}
+        if(!ActiveToken.equals("TABLE")){return "ERROR: Only table alters are permitted";}
         IncrementToken();
-        if(!isTable()){return false;}
+        if((activeTable = isTable(activeTable))==null){return "ERROR: Table not valid";}
         IncrementToken();
-        if((AlterationType=whatAlteration())==0){return false;}
+        if((AlterationType=whatAlteration())==0){return "ERROR: Invalid alteration type";}
         IncrementToken();
-        if(!alterAttribute()){return false;}
+        if(!alterAttribute()){return "ERROR: Unable to alter table";}
         IncrementToken();
-        return ActiveToken.equals(";");
+        if(!ActiveToken.equals(";")){return "ERROR: Missing or misplaced ';'";}
+        return "Table Altered successfully \n" + activeTable.getTableAsString();
     }
     private boolean alterAttribute(){
         switch(AlterationType) {

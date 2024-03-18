@@ -1,5 +1,4 @@
 package edu.uob;
-
 import java.util.ArrayList;
 
 public class Comparison {
@@ -21,7 +20,7 @@ public class Comparison {
     String ValueString;
     Table activeTable;
     int attributeIndex;
-    ArrayList<String> validIDList;
+    public ArrayList<String> validIDList;
     Comparison(){}
     public boolean evaluate(){
         validIDList = new ArrayList<String>();
@@ -155,7 +154,28 @@ public class Comparison {
         }
     }
     public boolean addValue(String value){
-        return isBooleanLiteral(value)|| isIntegerLiteral(value) || isFloatLiteral(value) || isStringLiteral(value);
+        String bufferValue = "";
+        if(StringUtils.isBooleanLiteral(value)){
+            typeOfValue = valueType.BOOLEAN;
+            ValueBoolean = value.equals("TRUE");
+            return true;
+        }
+        if(StringUtils.isIntegerLiteral(value)){
+            typeOfValue = valueType.INTEGER;
+            ValueInt = Integer.parseInt(value);
+            return true;
+        }
+        if(StringUtils.isFloatLiteral(value)){
+            typeOfValue = valueType.FLOAT;
+            ValueFloat = Float.parseFloat(value);
+            return true;
+        }
+        if(StringUtils.isStringLiteral(value,bufferValue)){
+            typeOfValue = valueType.STRING;
+            ValueString = bufferValue;
+            return true;
+        }
+        return false;
     }
     public boolean addAttribute(String title,Table table,int titleIndex){
         attribute=title;
@@ -191,61 +211,5 @@ public class Comparison {
             }
             default -> false;
         };
-    }
-    public boolean isIntegerLiteral(String value){
-        if (notValFirstValue(value)) return false;
-        for(int i=1;i<value.length();i++){
-            char character = value.charAt(i);
-            if(!(Character.isDigit(character))){return false;}
-        }
-        typeOfValue = valueType.INTEGER;
-        ValueInt = Integer.parseInt(value);
-        return true;
-    }
-
-    public boolean isBooleanLiteral(String value) {
-        if (value.equals("TRUE")){
-            ValueBoolean = true;
-            typeOfValue = valueType.BOOLEAN;
-            return true;
-        }
-        if (value.equals("FALSE")){
-            ValueBoolean = false;
-            typeOfValue = valueType.BOOLEAN;
-            return true;
-        }
-        return false;
-    }
-    public boolean isFloatLiteral(String value){
-        if (notValFirstValue(value)) return false;
-        boolean passedPeriod=false;
-        for(int i=1;i<value.length();i++){
-            char character = value.charAt(i);
-            if(!(Character.isDigit(character)||character=='.')){return false;}
-            if(character=='.') {if(!passedPeriod) {passedPeriod = true;} else {return false;}
-            }
-        }
-        typeOfValue = valueType.FLOAT;
-        ValueFloat = Float.parseFloat(value);
-        return true;
-    }
-    public boolean isStringLiteral(String token){
-        if(token.charAt(0)!='\''){return false;}
-        String bufferValue="";
-        for(int i=1;i<token.length()-1;i++) {
-            char character = token.charAt(i);
-            if(character==34||character==39||character==124){return false;}
-            bufferValue+=character;
-        }
-        if(token.charAt(0)!='\''){return false;}
-        typeOfValue = valueType.STRING;
-        ValueString = bufferValue;
-        return true;
-    }
-    private boolean notValFirstValue(String value) {
-        char firstValue =value.charAt(0);
-        if(firstValue=='+'){return false;}
-        else if (firstValue=='-') {return false;}
-        else return !Character.isDigit(firstValue);
     }
 }

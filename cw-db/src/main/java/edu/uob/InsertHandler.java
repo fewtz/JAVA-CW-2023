@@ -3,33 +3,40 @@ package edu.uob;
 import java.util.ArrayList;
 
 public class InsertHandler extends Handler {
+
+    //NEEDS MORE TESTING FREYA!
+
+
+
     String InsertValues;
     InsertHandler(ArrayList<String> Input){
         tokens = Input;
         InsertValues = "";
     }
-    public boolean handleInsert() {
+    public String handleInsert() {
         CurrentToken=0;
         IncrementToken();
-        if(!ActiveToken.equals("INTO")){return false;}
+        if(!ActiveToken.equals("INTO")){return "ERROR: Expected token 'INTO'";}
         IncrementToken();
-        if(!isTable()){return false;}
+        if((activeTable = isTable(activeTable))==null){return "ERROR: Invalid table";}
         IncrementToken();
-        if(!ActiveToken.equals("VALUES")){return false;}
+        if(!ActiveToken.equals("VALUES")){return "ERROR: Expected token 'VALUES'";}
         IncrementToken();
-        if(!ActiveToken.equals("(")){return false;}
+        if(!ActiveToken.equals("(")){return "ERROR: Expected token '('";}
+        if(!isValueList()){return "ERROR: Invalid value list";}
+        if(!ActiveToken.equals(")")){return "ERROR: Expected token ')'";}
         IncrementToken();
-        if(!isValueList()){return false;}
-        IncrementToken();
-        if(!ActiveToken.equals(")")){return false;}
-        IncrementToken();
-        if(!ActiveToken.equals(";")){return false;}
-        activeTable.insertValues(InsertValues);
-        return true;
-
+        if(!ActiveToken.equals(";")){return "ERROR: Missing or misplaced ';'";}
+        if(!activeTable.insertValues(InsertValues)){return "ERROR: Invalid input values";}
+        return "Values insert successfully";
     }
     private boolean isValueList(){
+        IncrementToken();
         if (!isValue()){return false;}
+        if(isStringLiteral()){
+            ActiveToken = ActiveToken.substring(1,ActiveToken.length()-1);
+        }
+        InsertValues += ActiveToken + "\t";
         IncrementToken();
         if(ActiveToken.equals(",")){
             return isValueList();

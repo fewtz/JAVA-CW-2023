@@ -71,27 +71,24 @@ abstract class Handler {
         InsertValues+=bufferValue + "\t";
         return true;
     }
-    public boolean isTable(){
+    public Table isTable(Table inpActiveTable){
         for(Table table : DBServer.activeDatabase.tables){
-            if(ActiveToken.equals(table.getName())){
-                activeTable = table;
-                return true;
+            if((ActiveToken+".tab").equals(table.getName())){
+                System.out.println(table.getName());
+                return table;
             }
         }
-        return false;
+        return null;
     }
     private boolean notValFirstValue(String buffer) {
         char firstValue =ActiveToken.charAt(0);
         if(firstValue=='+'){
-
             return false;
         }
         else if (firstValue=='-') {
-
             return false;
         }
         else if (Character.isDigit(firstValue)) {
-
             buffer+=firstValue;
             return false;
         }

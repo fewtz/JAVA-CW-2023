@@ -5,6 +5,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import java.io.*;
+
 
 public class Table {
     private int numberOfRows;
@@ -15,9 +17,13 @@ public class Table {
     public ArrayList<DataRow> DataList;
     private String TableName;
     private String TableAsString;
+    public File tableFile;
+    public ArrayList<valueType> typesOfValues;
+    public boolean isEmpty = true;
     //linked list....
-    Table(String Name){
+    Table(String Name,File inputFile){
         TableName = Name;
+        tableFile = inputFile;
         numberOfColumns = 0;
         numberOfRows = 0;
         DataList = new ArrayList<DataRow>();
@@ -25,48 +31,78 @@ public class Table {
         columnNames = new String[colNamesSize];
         TableAsString = "";
     }
+    public String getSpecificColumnNames(ArrayList<Integer> indecies){
+        String returnString = "";
+        for(Integer i : indecies){
+            returnString += columnNames[i] + " ";
+        }
+        returnString+="\n";
+        return returnString;
+    }
+    public void updateTableString(){
+        String newTableString = "";
+        for(String title : columnNames){
+            if(title!=null) {
+                newTableString += title + " ";
+            }
+        }
+        newTableString+="\n";
+        for(DataRow row : DataList){
+            row.updateRowString();
+            newTableString+=row.getDataRowAsString();
+            newTableString+="\n";
+        }
+        TableAsString = newTableString;
+    }
     public String getName(){
         return TableName;
     }
     public void addColumn(String title){
-        columnNames[colNamesSize++] = title;
+        columnNames[numberOfColumns++] = title;
+
         for(DataRow datarow : DataList){
-            datarow.addValue("");
+            datarow.addValue("*");
         }
+        updateTableString();
     }
     public void removeColumn(String title){
-        for(int i=0;i<colNamesSize;i++){
+        for(int i=0;i<numberOfColumns;i++){
             String colName = columnNames[i];
             if(colName.equals(title)){
-                removeFromList(columnNames,i,colNamesSize--);
+                removeFromList(columnNames,i,numberOfColumns--);
                 removeDataPoints(i);
             }
         }
+
+        updateTableString();
     }
-    public void insertValues(String values){
-        DataList.add(new DataRow(values,numberOfColumns));
+    public boolean insertValues(String values){
+        DataRow dataRow = new DataRow();
+        if(!dataRow.initialise(values, numberOfColumns)){ return false;}
+        if(!isEmpty) {
+            if(!dataRow.checkTypes(typesOfValues)){return false;}
+        }
+        isEmpty = false;
+        DataList.add(dataRow);
+        updateTableString();
+        return true;
     }
     private void removeDataPoints(int i){
         for(DataRow datarow : DataList){
             datarow.removeValue(i);
         }
+        updateTableString();
     }
     private void removeFromList(String[] list, int i,int listSize){
-        while(i<listSize){
+        while(i<listSize-1) {
             list[i++] = list[i+1];
         }
+        updateTableString();
     }
-    public void createTableFromFiles(BufferedReader inpBuffReader) throws IOException {
+    public void createTableFromFiles(BufferedReader inpBuffReader,File inputFile) throws IOException {
         buffReader = inpBuffReader;
         makeColumns(buffReader.readLine());
         readData();
-    }
-    public String getTableName(){
-        return TableName;
-    }
-
-    public int getNumberOfRows() {
-        return numberOfRows;
     }
     public int getNumberOfColumns() {
         return numberOfColumns;
@@ -76,9 +112,8 @@ public class Table {
         String colName = "";
         char currentChar;
         if(firstLine==null){
-            throw new RuntimeException("ERROR : Read empty file\n");
+            return;
         }
-
         for(int i=0;i<firstLine.length();i++){
             currentChar = firstLine.charAt(i);
             if (currentChar != '\t') {
@@ -111,18 +146,17 @@ public class Table {
         }
     }
     private void AddRow(String Input){
-        DataRow newRow = new DataRow(Input,numberOfColumns);
+        DataRow newRow = new DataRow();
+        newRow.initialise(Input,numberOfColumns);
         TableAsString += newRow.getDataRowAsString();
         DataList.add(newRow);
         numberOfRows++;
+        updateTableString();
+        isEmpty = false;
+        typesOfValues = DataList.get(0).getTypeList();
+        newRow.setTypeList(typesOfValues);
     }
     public String getTableAsString(){
         return TableAsString;
-    }
-    public void InsertNewRow(String Input){
-        AddRow(Input);
-    }
-    private void RemoveRow(DataRow row){
-        DataList.remove(row);
     }
 }

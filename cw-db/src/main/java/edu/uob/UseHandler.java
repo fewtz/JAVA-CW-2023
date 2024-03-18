@@ -3,30 +3,30 @@ package edu.uob;
 import java.util.ArrayList;
 
 public class UseHandler extends Handler{
-
+    private String ActiveDatabaseName;
+    private int indexOfDatabase;
     UseHandler(ArrayList<String> Input){
         tokens = Input;
     }
 
-    public boolean handleUse(){
+    public String handleUse(){
         CurrentToken = 0;
         IncrementToken();
-        int tableIndex=isTokenDatabaseName();
-        if(tableIndex>0){
-            SetActiveDatabase(tableIndex);
-        }else{
-            throw new RuntimeException("ERROR Invalid USE command: database does not exist");
-        }
+        if(!isTokenDatabaseName()){return "ERROR: Invalid database name";}
         IncrementToken();
-        return ActiveToken.equals(";");
+        if(!ActiveToken.equals(";")){return "ERROR: Missing or misplaced ';'";}
+        DBServer.activeDatabase = DBServer.databases.get(indexOfDatabase);
+        return "Active Database: " + ActiveDatabaseName;
     }
-    private int isTokenDatabaseName(){
+    private boolean isTokenDatabaseName(){
         for(Database database : DBServer.databases){
             if(ActiveToken.equals(database.getName())){
-                return DBServer.databases.indexOf(database);
+                indexOfDatabase =  DBServer.databases.indexOf(database);
+                ActiveDatabaseName = ActiveToken;
+                return true;
             }
         }
-        return 0;
+        return false;
     }
     private void SetActiveDatabase(int tableIndex){
         DBServer.activeDatabase = DBServer.databases.get(tableIndex);

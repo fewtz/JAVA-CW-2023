@@ -10,24 +10,49 @@ public class DataRow {
     private String DataRowAsString;
     ArrayList<valueType> datapointsTypes;
 
-    DataRow(String Input,int DesiredSize){
+    DataRow(){
         size =0;
         maxSize = 10;
         DataPoints = new String[maxSize];
         DataRowAsString = "";
+    }
+    public boolean initialise(String Input,int DesiredSize){
         MakeRow(Input);
-        CheckSize(DesiredSize);
+        return CheckSize(DesiredSize);
+    }
+    public void setTypeList(ArrayList<valueType> inputList){
+        datapointsTypes = inputList;
+    }
+    public ArrayList<valueType> getTypeList(){
+        for(String value : DataPoints){
+            if(value!=null) {
+                datapointsTypes.add(StringUtils.checkType(value));
+            }
+        }
+        return datapointsTypes;
+    }
+    public boolean checkTypes(ArrayList<valueType> inputList){
+        valueType type;
+        String value;
+        for(int i=0;i<size;i++){
+            value = DataPoints[i];
+            type = inputList.get(i);
+            if(!type.equals(StringUtils.checkType(value))){return false;}
+        }
+        datapointsTypes = inputList;
+        return true;
     }
     public void addValue(String datapoint){
         DataPoints[size++] = datapoint;
+        System.out.println("Added value !");
     }
     public void removeValue(int i){
         while(i<size){
-            DataPoints[i++] = DataPoints[i+1];
+            DataPoints[i] = DataPoints[i+1];
+            i++;
         }
         size--;
     }
-
     private void MakeRow(String Input){
         datapointsTypes = new ArrayList<valueType>();
         String datapoint = "";
@@ -50,74 +75,46 @@ public class DataRow {
         DataRowAsString += "\n";
     }
     private void addTypeList(String datapoint){
-        if(isBooleanLiteral(datapoint)){
+        if(StringUtils.isBooleanLiteral(datapoint)){
             datapointsTypes.add(valueType.BOOLEAN);
-            System.out.println("BOOLEAN"+datapoint);
             return;
         }
-        if(isIntegerLiteral(datapoint)){
+        if(StringUtils.isIntegerLiteral(datapoint)){
             datapointsTypes.add(valueType.INTEGER);
-            System.out.println("INT"+datapoint);
             return;
         }
-        if(isFloatLiteral(datapoint)){
+        if(StringUtils.isFloatLiteral(datapoint)){
             datapointsTypes.add(valueType.FLOAT);
-            System.out.println("FLOAT"+datapoint);
             return;
         }
         datapointsTypes.add(valueType.STRING);
-        System.out.println("STRING"+datapoint);
     }
     private void makeArrayBigger(){
         String[] newList = new String[maxSize*2];
         System.arraycopy(DataPoints, 0, newList, 0, DataPoints.length);
         DataPoints = newList;
     }
-    private void CheckSize(int DesiredSize){
-        if(DesiredSize!=size){
-            throw new RuntimeException("ERROR: inconsistent table width during creation");
-        }
+    private boolean CheckSize(int DesiredSize){
+        return DesiredSize==size;
     }
     public String getDataRowAsString(){
         return DataRowAsString;
     }
-    public boolean isBooleanLiteral(String value) {
-        if (value.equals("TRUE")){return true;}
-        return value.equals("FALSE");
-    }
-    public boolean isFloatLiteral(String value){
-        if (notValFirstValue(value)) return false;
-        boolean passedPeriod=false;
-        for(int i=1;i<value.length();i++){
-            char character = value.charAt(i);
-            if(!(Character.isDigit(character)||character=='.')){return false;}
-            if(character=='.') {if(!passedPeriod) {passedPeriod = true;} else {return false;}
+    public void updateRowString(){
+        String newRowString = "";
+        for(String datapoint : DataPoints){
+            if(datapoint!=null) {
+                newRowString += datapoint + " ";
             }
         }
-        return true;
+        DataRowAsString = newRowString;
     }
-    public boolean isIntegerLiteral(String value){
-        if (notValFirstValue(value)) return false;
-        for(int i=1;i<value.length();i++){
-            char character = value.charAt(i);
-            if(!(Character.isDigit(character))){return false;}
+    public String getSpecificDataRowValues(ArrayList<Integer> indecies){
+        String returnString = "";
+        for(Integer i : indecies){
+            returnString += DataPoints[i] + " ";
         }
-        return true;
-    }
-    public boolean isStringLiteral(String value){
-        if(value.charAt(0)!='\''){return false;}
-        String bufferValue="";
-        for(int i=1;i<value.length()-1;i++) {
-            char character = value.charAt(i);
-            if(character==34||character==39||character==124){return false;}
-        }
-        return value.charAt(0)!='\'';
-
-    }
-    private boolean notValFirstValue(String value) {
-        char firstValue =value.charAt(0);
-        if(firstValue=='+'){return false;}
-        else if (firstValue=='-') {return false;}
-        else return !Character.isDigit(firstValue);
+        returnString += "\n";
+        return returnString;
     }
 }

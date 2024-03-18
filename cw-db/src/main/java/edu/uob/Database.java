@@ -8,11 +8,14 @@ import java.util.ArrayList;
 public class Database {
     ArrayList<Table> tables;
     String Name;
+    File dataBaseFile;
     Database(String inputName){
         Name = inputName;
+        tables = new ArrayList<Table>();
     }
     public void createDatabaseFromFiles(File DatabaseDirectory) throws IOException {
         tables = new ArrayList<Table>();
+        dataBaseFile = DatabaseDirectory;
         File[] FilesList = DatabaseDirectory.listFiles();
         if(FilesList!=null) {
             for (File file : FilesList) {
@@ -34,9 +37,9 @@ public class Database {
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
-            Table newTable = new Table(file.getName());
+            Table newTable = new Table(file.getName(),file);
             tables.add(newTable);
-            newTable.createTableFromFiles(buffReader);
+            newTable.createTableFromFiles(buffReader,file);
         }
     }
 }

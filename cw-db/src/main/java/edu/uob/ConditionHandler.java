@@ -1,9 +1,6 @@
 package edu.uob;
-import javax.xml.crypto.Data;
 import java.util.ArrayList;
-import java.util.concurrent.locks.Condition;
-
-public class ConditionHandler extends Handler{
+public abstract class ConditionHandler extends Handler{
     enum ConditionComponent{
         BOOLEANOPERATOR,
         EXPRESSION,
@@ -19,16 +16,12 @@ public class ConditionHandler extends Handler{
     int numberOfCompoents;
     int furthestComponent=0;
     ArrayList<Comparison> comparisonsList;
+    ArrayList<DataRow> validRows;
 
-    ConditionHandler(ArrayList<String> Input){
-        tokens=Input;
-    }
     public boolean parseConditions(){
         conditionList = new ArrayList<ConditionComponent>();
-        CurrentToken = 1;
-        ActiveToken = tokens.get(CurrentToken);
         parsingToken = ActiveToken;
-        currentParsingToken=2;
+        currentParsingToken=CurrentToken+1;
         comparisonsList = new ArrayList<Comparison>();
         while(!parsingToken.equals(";")&&currentParsingToken<tokens.size()){
             if(!checkConditionComponentType()){return false;}
@@ -37,7 +30,6 @@ public class ConditionHandler extends Handler{
         printConditionList();
         numberOfCompoents=conditionList.size();
         if(!parseCondition()){return false;}
-        comparisonsList.get(0).printIDs();
         return true;
     }
     private void printConditionList(){
