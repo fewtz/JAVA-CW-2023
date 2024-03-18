@@ -11,12 +11,12 @@ public class Database {
     Database(String inputName){
         Name = inputName;
     }
-    public void createDatabaseFromFiles(File Input) throws IOException {
+    public void createDatabaseFromFiles(File DatabaseDirectory) throws IOException {
         tables = new ArrayList<Table>();
-        File[] FilesList = Input.listFiles();
-        if(FilesList[0]!=null) {
+        File[] FilesList = DatabaseDirectory.listFiles();
+        if(FilesList!=null) {
             for (File file : FilesList) {
-                if (file.isDirectory()) {
+                if (file.isFile()) {
                     readFile(file);
                 }
             }

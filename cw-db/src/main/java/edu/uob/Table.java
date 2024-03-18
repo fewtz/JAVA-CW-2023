@@ -12,7 +12,7 @@ public class Table {
     public String[] columnNames;
     private int colNamesSize;
     private BufferedReader buffReader;
-    private ArrayList<DataRow> DataList;
+    public ArrayList<DataRow> DataList;
     private String TableName;
     private String TableAsString;
     //linked list....
