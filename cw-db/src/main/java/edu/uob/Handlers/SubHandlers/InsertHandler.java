@@ -11,7 +11,7 @@ public class InsertHandler extends Handler {
         tokens = Input;
         InsertValues = "";
     }
-    public String handleInsert() {
+    public String handleInsert() throws GenericException {
         CurrentToken=0;
         IncrementToken();
         if(!ActiveToken.equals("INTO")){return "[ERROR] : Expected token 'INTO'";}
@@ -26,9 +26,10 @@ public class InsertHandler extends Handler {
         IncrementToken();
         if(!ActiveToken.equals(";")){return "[ERROR] : Missing or misplaced ';'";}
         if(!activeTable.insertValues(InsertValues)){return "[ERROR] : Invalid input values";}
+        if(!activeTable.writeToDisk()){return "[ERROR] : Unable to write to file";}
         return "[OK] \nValues insert successfully \n"+activeTable.getTableAsString();
     }
-    private boolean isValueList(){
+    private boolean isValueList() throws GenericException {
         IncrementToken();
         if (!isValue()){return false;}
         if(isStringLiteral()){

@@ -19,8 +19,12 @@ abstract class Handler {
 
 
     //need to catch overflows here !!1
-    public void IncrementToken(){
-        ActiveToken = tokens.get(++CurrentToken);
+    public void IncrementToken() throws GenericException{
+        try {
+            ActiveToken = tokens.get(++CurrentToken);
+        }catch(Exception e){
+            throw new GenericException("[ERROR]: Ran out of tokens early");
+        }
     }
     public boolean isPlainText(){
         for(int i=0;i<ActiveToken.length();i++){
@@ -76,7 +80,7 @@ abstract class Handler {
     }
     public Table isTable(Table inpActiveTable){
         for(Table table : DBServer.activeDatabase.tables){
-            if((ActiveToken+".tab").equals(table.getName())){
+            if((ActiveToken).equals(table.getName())){
                 System.out.println(table.getName());
                 return table;
             }

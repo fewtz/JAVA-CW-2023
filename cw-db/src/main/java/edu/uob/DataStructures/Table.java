@@ -22,7 +22,7 @@ public class Table {
     public boolean isEmpty = true;
     //linked list....
     Table(String Name,File inputFile){
-        TableName = Name+".tab";
+        TableName = Name;
         tableFile = inputFile;
         numberOfColumns = 0;
         numberOfRows = 0;
@@ -78,7 +78,7 @@ public class Table {
     }
     public boolean insertValues(String values){
         DataRow dataRow = new DataRow();
-        if(!dataRow.initialise(values, numberOfColumns,numberOfRows)){ return false;}
+        if(!dataRow.initialise(values, numberOfColumns,numberOfRows++)){ return false;}
         if(!isEmpty) {
             if(!dataRow.checkTypes(typesOfValues)){return false;}
         }
@@ -102,6 +102,7 @@ public class Table {
     public void createTableFromFiles(BufferedReader inpBuffReader,File inputFile) throws IOException {
         buffReader = inpBuffReader;
         makeColumns(buffReader.readLine());
+        TableName = TableName.substring(0,TableName.length()-4);
         readData();
     }
     public int getNumberOfColumns() {
@@ -158,5 +159,18 @@ public class Table {
     }
     public String getTableAsString(){
         return TableAsString;
+    }
+
+    public boolean writeToDisk(){
+        updateTableString();
+        try {
+            FileWriter fileWriter = new FileWriter(tableFile,false);
+            fileWriter.write(TableAsString);
+            fileWriter.close();
+        }catch(Exception IOException){
+            System.out.println("[ERROR] : Unable to write to file");
+            return false;
+        }
+        return true;
     }
 }

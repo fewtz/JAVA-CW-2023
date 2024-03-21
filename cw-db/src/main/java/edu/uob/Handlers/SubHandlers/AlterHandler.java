@@ -7,14 +7,14 @@ public class AlterHandler extends Handler{
     AlterHandler(ArrayList<String> Input){
         tokens = Input;
     }
-    public String handleAlter(){
+    public String handleAlter() throws GenericException {
         CurrentToken=0;
         IncrementToken();
-        if(!ActiveToken.equals("TABLE")){return "[ERROR] : Only table alters are permitted";}
+        if(!ActiveToken.equals("TABLE")){throw new GenericException("[ERROR] : Only table alters are permitted") ;}
         IncrementToken();
-        if((activeTable = isTable(activeTable))==null){return "[ERROR] : Table not valid";}
+        if((activeTable = isTable(activeTable))==null){throw new GenericException("[ERROR] : Table not valid");}
         IncrementToken();
-        if((AlterationType=whatAlteration())==0){return "[ERROR] : Invalid alteration type";}
+        if((AlterationType=whatAlteration())==0){throw new GenericException("[ERROR] : Invalid alteration type");}
         IncrementToken();
         if(!alterAttribute()){return "[ERROR] : Unable to alter table";}
         IncrementToken();

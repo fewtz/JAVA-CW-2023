@@ -7,7 +7,7 @@ public class DropHandler extends Handler {
     DropHandler(ArrayList<String> Input){
         tokens = Input;
     }
-    public String handleDrop(){
+    public String handleDrop() throws GenericException {
         CurrentToken = 0;
         IncrementToken();
         return switch (checkDataType()) {
@@ -16,7 +16,7 @@ public class DropHandler extends Handler {
             default -> "[ERROR] : Invalid drop type";
         };
     }
-    private String dropDatabase(){
+    private String dropDatabase() throws GenericException {
         IncrementToken();
         Database databaseToDrop=null;
         for(Database database : DBServer.databases){
@@ -37,7 +37,7 @@ public class DropHandler extends Handler {
         DBServer.databases.remove(databaseToDrop);
         return "[OK] \n Database removed: "+ActiveToken;
     }
-    private String dropTable(){
+    private String dropTable() throws GenericException {
         IncrementToken();
         Table tableToDelete=null;
         for(Table table : DBServer.activeDatabase.tables){

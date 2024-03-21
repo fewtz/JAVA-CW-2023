@@ -16,7 +16,7 @@ public class CreateHandler extends Handler{
     CreateHandler(ArrayList<String> Input){
         tokens = Input;
     }
-    public String handleCreate() throws IOException {
+    public String handleCreate() throws IOException, GenericException {
         CurrentToken = 0;
         IncrementToken();
         return switch (checkDataType()) {
@@ -25,15 +25,16 @@ public class CreateHandler extends Handler{
             default -> "[ERROR] : Invalid table or database";
         };
     }
-    private boolean makeTableTitles(){
+    private boolean makeTableTitles() throws GenericException {
         IncrementToken();
         if(!isPlainText()){return false;}
         newTable.addColumn(ActiveToken);
         IncrementToken();
         if(ActiveToken.equals(",")){return makeTableTitles();}
+        newTable.writeToDisk();
         return ActiveToken.equals(")");
     }
-    private String createDatabase(){
+    private String createDatabase() throws GenericException {
         IncrementToken();
         newDatabaseName = ActiveToken;
         IncrementToken();
@@ -45,7 +46,7 @@ public class CreateHandler extends Handler{
         newDatabase.dataBaseFile = newDatabaseFile;
         return "[OK] \nCreated new database: "+newDatabaseName  ;
     }
-    private String createTable() throws IOException {
+    private String createTable() throws IOException, GenericException {
         IncrementToken();
         newTableName = ActiveToken;
         File newTableFile = new File("databases/"+DBServer.activeDatabase.Name+"/"+ newTableName+".tab");
@@ -53,6 +54,7 @@ public class CreateHandler extends Handler{
         newTable = new Table(ActiveToken,newTableFile);
         DBServer.activeDatabase.tables.add(newTable);
         IncrementToken();
+        newTable.writeToDisk();
         if(ActiveToken.equals(";")){return "[OK] \nCreated new table: "+newTableName;}
         newTable.addColumn("id");
         if(makeTableTitles()){return "[OK] \nCreated new table: "+newTableName+"\n" + newTable.getTableAsString();}

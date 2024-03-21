@@ -1,15 +1,17 @@
-package edu.uob;
+package edu.uob.Utilities;
+
+import edu.uob.Handlers.SubHandlers.*;
+import edu.uob.Utilities.GenericException;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class CommandHandler {
     private ArrayList<String> tokens;
     CommandHandler(){
     }
 
-    public String handleNewCommand(String command) throws IOException {
+    public String handleNewCommand(String command) throws IOException, GenericException {
         Tokenizer tokenizer = new Tokenizer(command);
         tokens = tokenizer.tokenize();
         if(tokens.isEmpty()){return "ERROR: Failed to Tokenize";}
