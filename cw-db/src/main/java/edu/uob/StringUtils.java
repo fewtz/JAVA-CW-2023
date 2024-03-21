@@ -1,14 +1,14 @@
 package edu.uob;
 
 public abstract class StringUtils {
-    public static boolean isStringLiteral(String token,String bufferValue){
-        if(token.charAt(0)!='\''){return false;}
+    public static boolean isStringLiteral(String token,StringBuilder builder){
+        if((token.charAt(0)!=39)){return false;}
         for(int i=1;i<token.length()-1;i++) {
             char character = token.charAt(i);
             if(character==34||character==39||character==124){return false;}
-            bufferValue+=character;
+            builder.append(character);
         }
-        return token.charAt(0)!='\'';
+        return (token.charAt(token.length()-1)==39);
     }
     public static boolean isBooleanLiteral(String value) {
         if (value.equals("TRUE")){

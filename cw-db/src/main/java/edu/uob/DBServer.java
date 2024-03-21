@@ -18,8 +18,7 @@ public class DBServer {
     static public Database activeDatabase;
     public static void main(String args[]) throws IOException {
         DBServer server = new DBServer();
-        databases = new ArrayList<Database>();
-        setupDatabases();
+
         for(Database database : databases){
             for(Table table : database.tables){
                 System.out.print(table.getTableAsString());
@@ -28,7 +27,6 @@ public class DBServer {
         if(!databases.isEmpty()) {
             activeDatabase = databases.get(0);
         }
-        handler = new CommandHandler();
         server.blockingListenOn(8888);
     }
 
@@ -49,6 +47,10 @@ public class DBServer {
     * KEEP this signature otherwise we won't be able to mark your submission correctly.
     */
     public DBServer() {
+        databases = new ArrayList<Database>();
+        try{
+            setupDatabases();
+        }catch(Exception IOException){System.out.println("[ERROR] : Unable to set up databases");}
         storageFolderPath = Paths.get("databases").toAbsolutePath().toString();
         try {
             // Create the database storage folder if it doesn't already exist !
@@ -56,6 +58,7 @@ public class DBServer {
         } catch(IOException ioe) {
             System.out.println("Can't seem to create database storage folder " + storageFolderPath);
         }
+        handler = new CommandHandler();
     }
 
     /**

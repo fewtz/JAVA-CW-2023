@@ -25,8 +25,7 @@ public class Comparison {
     public boolean evaluate(){
         validIDList = new ArrayList<String>();
         for(DataRow dataRow : activeTable.DataList){
-            if(typeOfValue!=dataRow.datapointsTypes.get(attributeIndex)){return false;}
-            if((typeOfValue==valueType.BOOLEAN || typeOfValue==valueType.STRING )&& !(comparisonType==comparison.EQUALTO||comparisonType==comparison.NOTEQUALTO)){return false;}
+            if(typeOfValue!=dataRow.datapointsTypes.get(attributeIndex)){return true;}
             switch(typeOfValue){
                 case INTEGER -> testInteger(dataRow);
                 case BOOLEAN -> testBoolean(dataRow);
@@ -44,14 +43,14 @@ public class Comparison {
     private void testString(DataRow dataRow){
         switch (comparisonType) {
             case EQUALTO -> {
-                if (dataRow.DataPoints[attributeIndex].equals(ValueString)) {
-                    validIDList.add(dataRow.DataPoints[0]);
+                if (dataRow.DataPoints.get(attributeIndex).equals(ValueString)) {
+                    validIDList.add(dataRow.DataPoints.get(0));
                 }
                 return;
             }
             case NOTEQUALTO -> {
-                if (!dataRow.DataPoints[attributeIndex].equals(ValueString)) {
-                    validIDList.add(dataRow.DataPoints[0]);
+                if (!dataRow.DataPoints.get(attributeIndex).equals(ValueString)) {
+                    validIDList.add(dataRow.DataPoints.get(0));
                 }
                 return;
             }
@@ -60,14 +59,14 @@ public class Comparison {
     private void testBoolean(DataRow dataRow){
         switch (comparisonType) {
             case EQUALTO -> {
-                if (Boolean.parseBoolean(dataRow.DataPoints[attributeIndex]) == ValueBoolean) {
-                    validIDList.add(dataRow.DataPoints[0]);
+                if (Boolean.parseBoolean(dataRow.DataPoints.get(attributeIndex)) == ValueBoolean) {
+                    validIDList.add(dataRow.DataPoints.get(0));
                 }
                 return;
             }
             case NOTEQUALTO -> {
-                if (Boolean.parseBoolean(dataRow.DataPoints[attributeIndex]) != ValueBoolean) {
-                    validIDList.add(dataRow.DataPoints[0]);
+                if (Boolean.parseBoolean(dataRow.DataPoints.get(attributeIndex)) != ValueBoolean) {
+                    validIDList.add(dataRow.DataPoints.get(0));
                 }
                 return;
             }
@@ -76,38 +75,38 @@ public class Comparison {
     private void testFloat(DataRow dataRow){
         switch (comparisonType) {
             case EQUALTO -> {
-                if (Float.parseFloat(dataRow.DataPoints[attributeIndex]) == ValueFloat) {
-                    validIDList.add(dataRow.DataPoints[0]);
+                if (Float.parseFloat(dataRow.DataPoints.get(attributeIndex)) == ValueFloat) {
+                    validIDList.add(dataRow.DataPoints.get(0));
                 }
                 return;
             }
             case NOTEQUALTO -> {
-                if (Float.parseFloat(dataRow.DataPoints[attributeIndex]) != ValueFloat) {
-                    validIDList.add(dataRow.DataPoints[0]);
+                if (Float.parseFloat(dataRow.DataPoints.get(attributeIndex)) != ValueFloat) {
+                    validIDList.add(dataRow.DataPoints.get(0));
                 }
                 return;
             }
             case LESSTHAN -> {
-                if (Float.parseFloat(dataRow.DataPoints[attributeIndex]) < ValueFloat) {
-                    validIDList.add(dataRow.DataPoints[0]);
+                if (Float.parseFloat(dataRow.DataPoints.get(attributeIndex)) < ValueFloat) {
+                    validIDList.add(dataRow.DataPoints.get(0));
                 }
                 return;
             }
             case GREATERTHAN -> {
-                if (Float.parseFloat(dataRow.DataPoints[attributeIndex]) > ValueFloat) {
-                    validIDList.add(dataRow.DataPoints[0]);
+                if (Float.parseFloat(dataRow.DataPoints.get(attributeIndex)) > ValueFloat) {
+                    validIDList.add(dataRow.DataPoints.get(0));
                 }
                 return;
             }
             case LESSTHANEQUALTO -> {
-                if (Float.parseFloat(dataRow.DataPoints[attributeIndex]) <= ValueFloat) {
-                    validIDList.add(dataRow.DataPoints[0]);
+                if (Float.parseFloat(dataRow.DataPoints.get(attributeIndex)) <= ValueFloat) {
+                    validIDList.add(dataRow.DataPoints.get(0));
                 }
                 return;
             }
             case GREATERTHANEQUALTO -> {
-                if (Float.parseFloat(dataRow.DataPoints[attributeIndex]) >= ValueFloat) {
-                    validIDList.add(dataRow.DataPoints[0]);
+                if (Float.parseFloat(dataRow.DataPoints.get(attributeIndex)) >= ValueFloat) {
+                    validIDList.add(dataRow.DataPoints.get(0));
                 }
                 return;
             }
@@ -116,45 +115,45 @@ public class Comparison {
     private void testInteger(DataRow dataRow){
         switch (comparisonType) {
             case EQUALTO -> {
-                if (Integer.parseInt(dataRow.DataPoints[attributeIndex]) == ValueInt) {
-                    validIDList.add(dataRow.DataPoints[0]);
+                if (Integer.parseInt(dataRow.DataPoints.get(attributeIndex)) == ValueInt) {
+                    validIDList.add(dataRow.DataPoints.get(0));
                 }
                 return;
             }
             case NOTEQUALTO -> {
-                if (Integer.parseInt(dataRow.DataPoints[attributeIndex]) != ValueInt) {
-                    validIDList.add(dataRow.DataPoints[0]);
+                if (Integer.parseInt(dataRow.DataPoints.get(attributeIndex)) != ValueInt) {
+                    validIDList.add(dataRow.DataPoints.get(0));
                 }
                 return;
             }
             case LESSTHAN -> {
-                if (Integer.parseInt(dataRow.DataPoints[attributeIndex]) < ValueInt) {
-                    validIDList.add(dataRow.DataPoints[0]);
+                if (Integer.parseInt(dataRow.DataPoints.get(attributeIndex)) < ValueInt) {
+                    validIDList.add(dataRow.DataPoints.get(0));
                 }
                 return;
             }
             case GREATERTHAN -> {
-                if (Integer.parseInt(dataRow.DataPoints[attributeIndex]) > ValueInt) {
-                    validIDList.add(dataRow.DataPoints[0]);
+                if (Integer.parseInt(dataRow.DataPoints.get(attributeIndex)) > ValueInt) {
+                    validIDList.add(dataRow.DataPoints.get(0));
                 }
                 return;
             }
             case LESSTHANEQUALTO -> {
-                if (Integer.parseInt(dataRow.DataPoints[attributeIndex]) <= ValueInt) {
-                    validIDList.add(dataRow.DataPoints[0]);
+                if (Integer.parseInt(dataRow.DataPoints.get(attributeIndex)) <= ValueInt) {
+                    validIDList.add(dataRow.DataPoints.get(0));
                 }
                 return;
             }
             case GREATERTHANEQUALTO -> {
-                if (Integer.parseInt(dataRow.DataPoints[attributeIndex]) >= ValueInt) {
-                    validIDList.add(dataRow.DataPoints[0]);
+                if (Integer.parseInt(dataRow.DataPoints.get(attributeIndex)) >= ValueInt) {
+                    validIDList.add(dataRow.DataPoints.get(0));
                 }
                 return;
             }
         }
     }
     public boolean addValue(String value){
-        String bufferValue = "";
+        StringBuilder bufferBuilder = new StringBuilder();
         if(StringUtils.isBooleanLiteral(value)){
             typeOfValue = valueType.BOOLEAN;
             ValueBoolean = value.equals("TRUE");
@@ -170,9 +169,10 @@ public class Comparison {
             ValueFloat = Float.parseFloat(value);
             return true;
         }
-        if(StringUtils.isStringLiteral(value,bufferValue)){
+        if(StringUtils.isStringLiteral(value,bufferBuilder)){
+            value = bufferBuilder.toString();
             typeOfValue = valueType.STRING;
-            ValueString = bufferValue;
+            ValueString = value;
             return true;
         }
         return false;

@@ -16,6 +16,9 @@ abstract class Handler {
     public String ActiveToken;
     public Table activeTable;
     String InsertValues;
+
+
+    //need to catch overflows here !!1
     public void IncrementToken(){
         ActiveToken = tokens.get(++CurrentToken);
     }

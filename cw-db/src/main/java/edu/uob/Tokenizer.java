@@ -43,9 +43,9 @@ public class Tokenizer {
         }
     }
     private int isFlushToken(char current){
-        if(current == ' ' || current == '(' || current == ')' || current == ',') {
+        if(current == ' ' || current == ')' ) {
             return 1;
-        } else if ( current == '=' || current == '>' || current == '<'){
+        } else if ( current == '=' || current == '>' || current == '<' || current == '(' || current == ','){
             return 2;
         }else if( current == ';'){
             return 3;

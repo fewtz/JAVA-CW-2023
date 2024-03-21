@@ -13,7 +13,7 @@ public class DropHandler extends Handler {
         return switch (checkDataType()) {
             case 1 -> dropDatabase();
             case 2 -> dropTable();
-            default -> "ERROR: Invalid drop type";
+            default -> "[ERROR] : Invalid drop type";
         };
     }
     private String dropDatabase(){
@@ -24,18 +24,18 @@ public class DropHandler extends Handler {
                 databaseToDrop = database;
             }
         }
-        if(databaseToDrop==null){return "ERROR: Invalid database name";}
+        if(databaseToDrop==null){return "[ERROR] : Invalid database name";}
         File databaseToDeleteFile = databaseToDrop.dataBaseFile;
         File[] allContents = databaseToDeleteFile.listFiles();
         if (allContents != null) {
             for (File file : allContents) {
                 System.out.println(file.getName());
-                if(!file.delete()){return "ERROR: Unable to delete file in database";}
+                if(!file.delete()){return "[ERROR] : Unable to delete file in database";}
             }
         }
-        if(!databaseToDeleteFile.delete()){return "ERROR: Unable to delete database";}
+        if(!databaseToDeleteFile.delete()){return "[ERROR] : Unable to delete database";}
         DBServer.databases.remove(databaseToDrop);
-        return "Database removed: "+ActiveToken;
+        return "[OK] \n Database removed: "+ActiveToken;
     }
     private String dropTable(){
         IncrementToken();
@@ -45,10 +45,10 @@ public class DropHandler extends Handler {
                 tableToDelete = table;
             }
         }
-        if(tableToDelete == null){return "ERROR: Table does not exist in scope";}
-        if(!tableToDelete.tableFile.delete()){return "ERROR: Unable to delete table";}
+        if(tableToDelete == null){return "[ERROR] : Table does not exist in scope";}
+        if(!tableToDelete.tableFile.delete()){return "[ERROR] : Unable to delete table";}
         DBServer.activeDatabase.tables.remove(tableToDelete);
-        return "Table removed: "+ActiveToken;
+        return "[OK] \nTable removed: "+ActiveToken;
     }
     private int checkDataType(){
         if(ActiveToken.equals("DATABASE")){

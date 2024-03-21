@@ -5,19 +5,17 @@ import java.util.ArrayList;
 public class DataRow {
 
     private int size;
-    String[] DataPoints;
-    private int maxSize;
+    ArrayList<String> DataPoints;
     private String DataRowAsString;
     ArrayList<valueType> datapointsTypes;
 
     DataRow(){
         size =0;
-        maxSize = 10;
-        DataPoints = new String[maxSize];
+        DataPoints = new ArrayList<String>();
         DataRowAsString = "";
     }
-    public boolean initialise(String Input,int DesiredSize){
-        MakeRow(Input);
+    public boolean initialise(String Input,int DesiredSize,int positionInTable){
+        MakeRow(Input,positionInTable);
         return CheckSize(DesiredSize);
     }
     public void setTypeList(ArrayList<valueType> inputList){
@@ -35,7 +33,7 @@ public class DataRow {
         valueType type;
         String value;
         for(int i=0;i<size;i++){
-            value = DataPoints[i];
+            value = DataPoints.get(i);
             type = inputList.get(i);
             if(!type.equals(StringUtils.checkType(value))){return false;}
         }
@@ -43,19 +41,20 @@ public class DataRow {
         return true;
     }
     public void addValue(String datapoint){
-        DataPoints[size++] = datapoint;
-        System.out.println("Added value !");
+        DataPoints.add(datapoint);
     }
     public void removeValue(int i){
         while(i<size){
-            DataPoints[i] = DataPoints[i+1];
+            DataPoints.set(i,DataPoints.get(i+1));
             i++;
         }
         size--;
     }
-    private void MakeRow(String Input){
+    private void MakeRow(String Input,int positionInTable){
         datapointsTypes = new ArrayList<valueType>();
         String datapoint = "";
+        DataPoints.add(Integer.toString(positionInTable));
+        datapointsTypes.add(valueType.INTEGER);
         char currentChar;
         for(int i=0;i<Input.length();i++) {
             currentChar = Input.charAt(i);
@@ -63,13 +62,12 @@ public class DataRow {
                 datapoint += currentChar;
             } else {
                 //INSERT DATAPOINT
-                DataPoints[size++] = datapoint;
+                StringBuilder temp = new StringBuilder();
+                if(StringUtils.isStringLiteral(datapoint,temp)){datapoint=temp.toString();}
+                DataPoints.add(datapoint);
                 addTypeList(datapoint);
-                DataRowAsString += datapoint +" ";
+                DataRowAsString += datapoint +"\t";
                 datapoint = "";
-                if(size>=maxSize){
-                    makeArrayBigger();
-                }
             }
         }
         DataRowAsString += "\n";
@@ -89,13 +87,8 @@ public class DataRow {
         }
         datapointsTypes.add(valueType.STRING);
     }
-    private void makeArrayBigger(){
-        String[] newList = new String[maxSize*2];
-        System.arraycopy(DataPoints, 0, newList, 0, DataPoints.length);
-        DataPoints = newList;
-    }
     private boolean CheckSize(int DesiredSize){
-        return DesiredSize==size;
+        return DesiredSize==DataPoints.size();
     }
     public String getDataRowAsString(){
         return DataRowAsString;
@@ -104,7 +97,7 @@ public class DataRow {
         String newRowString = "";
         for(String datapoint : DataPoints){
             if(datapoint!=null) {
-                newRowString += datapoint + " ";
+                newRowString += datapoint + "\t";
             }
         }
         DataRowAsString = newRowString;
@@ -112,7 +105,7 @@ public class DataRow {
     public String getSpecificDataRowValues(ArrayList<Integer> indecies){
         String returnString = "";
         for(Integer i : indecies){
-            returnString += DataPoints[i] + " ";
+            returnString += DataPoints.get(i) + "\t";
         }
         returnString += "\n";
         return returnString;

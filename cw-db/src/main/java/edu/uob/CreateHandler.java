@@ -22,7 +22,7 @@ public class CreateHandler extends Handler{
         return switch (checkDataType()) {
             case 1 -> createDatabase();
             case 2 -> createTable();
-            default -> "ERROR: Invalid table or database";
+            default -> "[ERROR] : Invalid table or database";
         };
     }
     private boolean makeTableTitles(){
@@ -37,25 +37,26 @@ public class CreateHandler extends Handler{
         IncrementToken();
         newDatabaseName = ActiveToken;
         IncrementToken();
-        if(!ActiveToken.equals(";")){return "ERROR: Missing or misplaced ';'";}
+        if(!ActiveToken.equals(";")){return "[ERROR] : Missing or misplaced ';'";}
         File newDatabaseFile = new File("databases/"+newDatabaseName);
         Database newDatabase = new Database(newDatabaseName);
-        if(! (newDatabaseFile.mkdirs())){return "ERROR: Unable to make new database";}
+        if(! (newDatabaseFile.mkdirs())){return "[ERROR] : Unable to make new database";}
         DBServer.databases.add(newDatabase);
         newDatabase.dataBaseFile = newDatabaseFile;
-        return "Created new database: "+newDatabaseName  ;
+        return "[OK] \nCreated new database: "+newDatabaseName  ;
     }
     private String createTable() throws IOException {
         IncrementToken();
         newTableName = ActiveToken;
         File newTableFile = new File("databases/"+DBServer.activeDatabase.Name+"/"+ newTableName+".tab");
-        if(!newTableFile.createNewFile()){return "ERROR: Unable to create new table";}
+        if(!newTableFile.createNewFile()){return "[ERROR] : Unable to create new table";}
         newTable = new Table(ActiveToken,newTableFile);
         DBServer.activeDatabase.tables.add(newTable);
         IncrementToken();
-        if(ActiveToken.equals(";")){return "Created new table: "+newTableName;}
-        if(makeTableTitles()){return "Created new table: "+newTableName+"\n" + newTable.getTableAsString();}
-        return "ERROR: Invalid table name list";
+        if(ActiveToken.equals(";")){return "[OK] \nCreated new table: "+newTableName;}
+        newTable.addColumn("id");
+        if(makeTableTitles()){return "[OK] \nCreated new table: "+newTableName+"\n" + newTable.getTableAsString();}
+        return "[ERROR] : Invalid table name list";
     }
     private int checkDataType(){
         System.out.println(ActiveToken);

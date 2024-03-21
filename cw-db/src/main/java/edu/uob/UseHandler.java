@@ -12,11 +12,11 @@ public class UseHandler extends Handler{
     public String handleUse(){
         CurrentToken = 0;
         IncrementToken();
-        if(!isTokenDatabaseName()){return "ERROR: Invalid database name";}
+        if(!isTokenDatabaseName()){return "[ERROR] : Invalid database name";}
         IncrementToken();
-        if(!ActiveToken.equals(";")){return "ERROR: Missing or misplaced ';'";}
+        if(!ActiveToken.equals(";")){return "[ERROR] : Missing or misplaced ';'";}
         DBServer.activeDatabase = DBServer.databases.get(indexOfDatabase);
-        return "Active Database: " + ActiveDatabaseName;
+        return "[OK] \nActive Database: " + ActiveDatabaseName;
     }
     private boolean isTokenDatabaseName(){
         for(Database database : DBServer.databases){

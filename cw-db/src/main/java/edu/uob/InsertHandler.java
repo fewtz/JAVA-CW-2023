@@ -6,8 +6,6 @@ public class InsertHandler extends Handler {
 
     //NEEDS MORE TESTING FREYA!
 
-
-
     String InsertValues;
     InsertHandler(ArrayList<String> Input){
         tokens = Input;
@@ -16,19 +14,19 @@ public class InsertHandler extends Handler {
     public String handleInsert() {
         CurrentToken=0;
         IncrementToken();
-        if(!ActiveToken.equals("INTO")){return "ERROR: Expected token 'INTO'";}
+        if(!ActiveToken.equals("INTO")){return "[ERROR] : Expected token 'INTO'";}
         IncrementToken();
-        if((activeTable = isTable(activeTable))==null){return "ERROR: Invalid table";}
+        if((activeTable = isTable(activeTable))==null){return "[ERROR] : Invalid table";}
         IncrementToken();
-        if(!ActiveToken.equals("VALUES")){return "ERROR: Expected token 'VALUES'";}
+        if(!ActiveToken.equals("VALUES")){return "[ERROR] : Expected token 'VALUES'";}
         IncrementToken();
-        if(!ActiveToken.equals("(")){return "ERROR: Expected token '('";}
-        if(!isValueList()){return "ERROR: Invalid value list";}
-        if(!ActiveToken.equals(")")){return "ERROR: Expected token ')'";}
+        if(!ActiveToken.equals("(")){return "[ERROR] : Expected token '('";}
+        if(!isValueList()){return "[ERROR] : Invalid value list";}
+        if(!ActiveToken.equals(")")){return "[ERROR] : Expected token ')'";}
         IncrementToken();
-        if(!ActiveToken.equals(";")){return "ERROR: Missing or misplaced ';'";}
-        if(!activeTable.insertValues(InsertValues)){return "ERROR: Invalid input values";}
-        return "Values insert successfully";
+        if(!ActiveToken.equals(";")){return "[ERROR] : Missing or misplaced ';'";}
+        if(!activeTable.insertValues(InsertValues)){return "[ERROR] : Invalid input values";}
+        return "[OK] \nValues insert successfully \n"+activeTable.getTableAsString();
     }
     private boolean isValueList(){
         IncrementToken();

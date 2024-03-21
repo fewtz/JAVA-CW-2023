@@ -8,24 +8,23 @@ public class SelectHandler extends ConditionHandler{
     ArrayList<Integer> attributeIndexList;
     ArrayList<String> attributeStringList = new ArrayList<String>();
     boolean wildList=false;
+    boolean isList=false;
     SelectHandler(ArrayList<String> Input) {
         tokens = Input;
     }
     public String handleSelect(){
         CurrentToken =0;
+        if(!isAttributeList()){return "[ERROR] : That is not a valid attribute list";}
         IncrementToken();
-        if(!ActiveToken.equals("(")){return "ERROR: Expected an opening brace";}
-        if(!isAttributeList()){return "ERROR: That is not a valid attribute";}
+        if(!ActiveToken.equals("FROM")){return "[ERROR] : That is not a valid select command";}
         IncrementToken();
-        if(!ActiveToken.equals("FROM")){return "ERROR: That is not a valid select command";}
+        if((activeTable = isTable(activeTable))==null){return "[ERROR] : That is not a valid table name";}
         IncrementToken();
-        if((activeTable = isTable(activeTable))==null){return "ERROR: That is not a valid table name";}
-        IncrementToken();
-        if(!generateAttributeIndexes()){return "ERROR: That attribute is not in scope";}
+        if(!generateAttributeIndexes()){return "[ERROR] : That attribute is not in scope";}
         if(ActiveToken.equals(";")){return pushAll();}
-        if(!ActiveToken.equals("WHERE")){return "ERROR: That is not a valid select command";}
+        if(!ActiveToken.equals("WHERE")){return "[ERROR] : That is not a valid select command";}
         IncrementToken();
-        if(!validConditions()){return "ERROR: That is not a valid condition";}
+        if(!validConditions()){return "[ERROR] : That is not a valid condition";}
         return pushSelected();
     }
     private boolean generateAttributeIndexes(){
@@ -54,7 +53,7 @@ public class SelectHandler extends ConditionHandler{
         return true;
     }
     private String pushSelected(){
-        String output = "";
+        String output = "[OK] \n";
         output += activeTable.getSpecificColumnNames(attributeIndexList);
         for(DataRow dataRow : validRows){
             output += dataRow.getSpecificDataRowValues(attributeIndexList);
@@ -62,7 +61,7 @@ public class SelectHandler extends ConditionHandler{
         return output;
     }
     private String pushAll(){
-        String output = "";
+        String output = "[OK]\n";
         output += activeTable.getSpecificColumnNames(attributeIndexList);
         for(DataRow dataRow : activeTable.DataList){
             output += dataRow.getSpecificDataRowValues(attributeIndexList);
@@ -71,22 +70,35 @@ public class SelectHandler extends ConditionHandler{
     }
     private boolean isAttributeList(){
         IncrementToken();
-        if(ActiveToken.equals("*")){
-            IncrementToken();
-            return wildList = true;
+        if(!isList) {
+            if (ActiveToken.equals("*")) {
+                return wildList = true;
+            }
+            if (isPlainText()) {
+                attributeStringList.add(ActiveToken);
+                return true;
+            }
         }
-        if(!isPlainText()){return false;}
-        attributeStringList.add(ActiveToken);
-        IncrementToken();
-        if(ActiveToken.equals(",")){return isAttributeList();}
-        return ActiveToken.equals(")");
+        if(ActiveToken.equals("(")){isList = true;}
+        if(isList) {
+            if (!isPlainText()) {
+                return false;
+            }
+            attributeStringList.add(ActiveToken);
+            IncrementToken();
+            if (ActiveToken.equals(",")) {
+                return isAttributeList();
+            }
+            return ActiveToken.equals(")");
+        }
+        return false;
     }
     public boolean validConditions(){
         if(!parseConditions()){return false;}
         validRows = new ArrayList<DataRow>();
         for(DataRow dataRow : activeTable.DataList){
             for(String validID : comparisonsList.get(0).validIDList){
-                if(dataRow.DataPoints[0].equals(validID)){
+                if(dataRow.DataPoints.get(0).equals(validID)){
                     validRows.add(dataRow);
                 }
             }

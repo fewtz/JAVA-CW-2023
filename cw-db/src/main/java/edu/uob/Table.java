@@ -22,7 +22,7 @@ public class Table {
     public boolean isEmpty = true;
     //linked list....
     Table(String Name,File inputFile){
-        TableName = Name;
+        TableName = Name+".tab";
         tableFile = inputFile;
         numberOfColumns = 0;
         numberOfRows = 0;
@@ -43,7 +43,7 @@ public class Table {
         String newTableString = "";
         for(String title : columnNames){
             if(title!=null) {
-                newTableString += title + " ";
+                newTableString += title + "\t";
             }
         }
         newTableString+="\n";
@@ -78,7 +78,7 @@ public class Table {
     }
     public boolean insertValues(String values){
         DataRow dataRow = new DataRow();
-        if(!dataRow.initialise(values, numberOfColumns)){ return false;}
+        if(!dataRow.initialise(values, numberOfColumns,numberOfRows)){ return false;}
         if(!isEmpty) {
             if(!dataRow.checkTypes(typesOfValues)){return false;}
         }
@@ -121,7 +121,7 @@ public class Table {
             }
             else{
                 columnNames[numberOfColumns++] = colName;
-                TableAsString += colName + " ";
+                TableAsString += colName + "\t";
                 colName = "";
                 if(numberOfColumns>=colNamesSize){
                     makeNamesArrayBigger();
@@ -147,7 +147,7 @@ public class Table {
     }
     private void AddRow(String Input){
         DataRow newRow = new DataRow();
-        newRow.initialise(Input,numberOfColumns);
+        newRow.initialise(Input,numberOfColumns,numberOfRows);
         TableAsString += newRow.getDataRowAsString();
         DataList.add(newRow);
         numberOfRows++;
