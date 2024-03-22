@@ -1,11 +1,11 @@
-package edu.uob.Handlers.SubHandlers;
+package edu.uob.Handlers;
 
 import java.util.ArrayList;
 
 public class Tokenizer {
     ArrayList<String> tokens;
     String command;
-    Tokenizer(String Input){
+    public Tokenizer(String Input){
         command = Input;
     }
     public ArrayList<String> tokenize() throws IndexOutOfBoundsException{

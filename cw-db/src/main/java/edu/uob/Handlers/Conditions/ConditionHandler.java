@@ -1,6 +1,12 @@
-package edu.uob;
+package edu.uob.Handlers.Conditions;
+import edu.uob.*;
+import edu.uob.DataStructures.DataRow;
+import edu.uob.DataStructures.Table;
+import edu.uob.Handlers.Handler;
+import edu.uob.Utilities.GenericException;
+
 import java.util.ArrayList;
-public abstract class ConditionHandler extends Handler{
+public abstract class ConditionHandler extends Handler {
     enum ConditionComponent{
         BOOLEANOPERATOR,
         EXPRESSION,
@@ -15,22 +21,21 @@ public abstract class ConditionHandler extends Handler{
     int inUseBrackets = 0;
     int numberOfCompoents;
     int furthestComponent=0;
-    ArrayList<Comparison> comparisonsList;
-    ArrayList<DataRow> validRows;
+    public ArrayList<Comparison> comparisonsList;
+    public ArrayList<DataRow> validRows;
 
-    public boolean parseConditions(){
+    public void parseConditions() throws GenericException {
         conditionList = new ArrayList<ConditionComponent>();
         parsingToken = ActiveToken;
         currentParsingToken=CurrentToken+1;
         comparisonsList = new ArrayList<Comparison>();
         while(!parsingToken.equals(";")&&currentParsingToken<tokens.size()){
-            if(!checkConditionComponentType()){return false;}
+            if(!checkConditionComponentType()){throw new GenericException("[ERROR] : Invalid condition tokens");}
             IncrementParsingToken();
         }
         printConditionList();
         numberOfCompoents=conditionList.size();
-        if(!parseCondition()){return false;}
-        return true;
+        if(!parseCondition()){throw new GenericException("[ERROR] : Invalid condition logic");}
     }
     private void printConditionList(){
         for(ConditionComponent component : conditionList){
@@ -133,37 +138,36 @@ public abstract class ConditionHandler extends Handler{
     }
     public boolean isExpression(){
         Comparison newComparison = new Comparison();
-        if(!isAttribute(newComparison)){return false;}
+        if(!isAttribute(newComparison,parsingToken)){return false;}
         IncrementParsingToken();
-        if(!isComparator(newComparison)){return false;}
+        if(!isComparator(newComparison,parsingToken)){return false;}
         IncrementParsingToken();
-        if(!isValue(newComparison)){return false;}
+        if(!isValue(newComparison,parsingToken)){return false;}
         if(!newComparison.evaluate()){return false;}
         comparisonsList.add(newComparison);
         return true;
     }
-    public boolean isValue(Comparison newComparison){
-        return newComparison.addValue(parsingToken);
+    public boolean isValue(Comparison newComparison, String token){
+        return newComparison.addValue(token);
     }
-    public boolean isAttribute(Comparison newComparison){
-        for(Table table : DBServer.activeDatabase.tables){
-            for(int i=0;i<table.columnNames.length;i++){
-                String title = table.columnNames[i];
-                if(parsingToken.equals(title)){
-                    return newComparison.addAttribute(title,table,i);
+    public boolean isAttribute(Comparison newComparison,String token){
+
+            for(int i=0;i<activeTable.columnNames.size();i++){
+                String title = activeTable.columnNames.get(i);
+                if(token.equals(title)){
+                    return newComparison.addAttribute(activeTable,i);
                 }
             }
-        }
         return false;
     }
-    public boolean isComparator(Comparison newComparison){
-        return switch(parsingToken){
-            case "<",">","==","!=","<=",">=" -> newComparison.addType(parsingToken);
+    public boolean isComparator(Comparison newComparison,String token){
+        return switch(token.toUpperCase()){
+            case "<",">","==","!=","<=",">=","LIKE" -> newComparison.addType(token);
             default -> false;
         };
     }
     public boolean isBooleanOperator(){
-        return  switch(parsingToken){
+        return  switch(parsingToken.toUpperCase()){
             case "AND","OR" -> true;
             default -> false;
         };
@@ -173,5 +177,17 @@ public abstract class ConditionHandler extends Handler{
     }
     public boolean isCloseBracket(){
         return parsingToken.equals(")");
+    }
+    public void checkValidConditions(Table table) throws GenericException {
+        activeTable = table;
+        parseConditions();
+        validRows = new ArrayList<DataRow>();
+        for(DataRow dataRow : table.DataList){
+            for(String validID : comparisonsList.get(0).validIDList){
+                if(dataRow.DataPoints.get(0).equals(validID)){
+                    validRows.add(dataRow);
+                }
+            }
+        }
     }
 }

@@ -1,4 +1,4 @@
-package edu.uob;
+package edu.uob.Utilities;
 
 public abstract class StringUtils {
     public static boolean isStringLiteral(String token,StringBuilder builder){

@@ -100,5 +100,46 @@ public class ExampleDBTests {
         assertTrue(response.contains("[ERROR]"), "An attempt was made to access a non-existent table, however an [ERROR] tag was not returned");
         assertFalse(response.contains("[OK]"), "An attempt was made to access a non-existent table, however an [OK] tag was returned");
     }
+    @Test
+    public void Use(){
+        String randomName = generateRandomName();
+        String response = sendCommandToServer("USE " + randomName + ";");
+        assertTrue(response.contains("[ERROR]"), "An attempt was made to use an invalid database, however an [ERROR] tag was not returned");
+        sendCommandToServer("CREATE DATABASE " + randomName + ";");
+        response = sendCommandToServer("USE " + randomName + ";");
+        assertFalse(response.contains("[ERROR]"), "An attempt was made to use a valid database, however an [ERROR] tag was returned");
+    }
+    @Test
+    public void Create(){
+        String randomName = generateRandomName();
+        sendCommandToServer("CREATE DATABASE " + randomName + ";");
+        String response = sendCommandToServer("CREATE DATABASE " + randomName + ";");
+        assertTrue(response.contains("[ERROR]"), "An attempt was made to create an already created database, however an [ERROR] tag was not returned");
+        sendCommandToServer("USE " + randomName + ";");
+        response = sendCommandToServer("CREATE TABLE " + randomName + " (A,B,C);");
+        assertTrue(response.contains("[OK]"), "An attempt was made to create valid table, and it failed.");
+        response = sendCommandToServer("CREATE TABLE " + randomName + " (A,B,C);");
+        assertTrue(response.contains("[ERROR]"), "An attempt was made to create an already created table, however an [ERROR] tag was not returned");
+    }
+    @Test
+    public void Alter(){
+        String randomName = generateRandomName();
+        sendCommandToServer("CREATE DATABASE " + randomName + ";");
+        sendCommandToServer("USE " + randomName + ";");
+        randomName = generateRandomName();
+        sendCommandToServer("CREATE TABLE " + randomName + " (A,B,C);");
+        String response = sendCommandToServer("ALTER TABLE " + randomName + " ADD D;");
+        assertTrue(response.contains("[OK]"), "An attempt was made to add a valid column but it failed.");
+        response = sendCommandToServer("ALTER TABLE " + randomName + " ADD D;");
+        assertFalse(response.contains("[OK]"), "An attempt was made to add a column that already existed, and it didnt fail.");
+        response= sendCommandToServer("ALTER TABLE " + randomName + " DROP D;");
+        assertTrue(response.contains("[OK]"), "An attempt was made to drop a valid column but it failed.");
+        response = sendCommandToServer("ALTER TABLE " + randomName + " DROP D;");
+        assertFalse(response.contains("[OK]"), "An attempt was made to drop a nonexistant column, and it didnt fail.");
+        sendCommandToServer("ALTER TABLE " + randomName + " ADD D;");
+        sendCommandToServer("INSERT INTO "+randomName+" VALUES (1,2,3)");
+        response= sendCommandToServer("ALTER TABLE " + randomName + " DROP D;");
+        assertTrue(response.contains("[OK]"), "An attempt was made to drop a non empty column, and it failed.");
+    }
 
 }

@@ -1,4 +1,4 @@
-package edu.uob.Utilities;
+package edu.uob.Handlers;
 
 import edu.uob.Handlers.SubHandlers.*;
 import edu.uob.Utilities.GenericException;
@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class CommandHandler {
     private ArrayList<String> tokens;
-    CommandHandler(){
+    public CommandHandler(){
     }
 
     public String handleNewCommand(String command) throws IOException, GenericException {
@@ -41,11 +41,15 @@ public class CommandHandler {
                 SelectHandler selectHandler = new SelectHandler(tokens);
                 yield selectHandler.handleSelect();
             }
+            case 7 -> {
+                UpdateHandler updateHandler = new UpdateHandler(tokens);
+                yield updateHandler.handleUpdate();
+            }
             default -> "ERROR: Unknown command";
         };
     }
     private int getCommandType(String command){
-        return switch (command) {
+        return switch (command.toUpperCase()) {
             case "USE" -> 1;
             case "CREATE" -> 2;
             case "DROP" -> 3;

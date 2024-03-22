@@ -1,16 +1,18 @@
 package edu.uob;
 
+import edu.uob.DataStructures.Database;
+import edu.uob.DataStructures.Table;
+import edu.uob.Handlers.CommandHandler;
+import edu.uob.Utilities.GenericException;
+
 import java.io.*;
-import java.lang.reflect.Array;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Paths;
 import java.nio.file.Files;
 import java.util.ArrayList;
 
-/** This class implements the DB server. */
 public class DBServer {
-
     private static final char END_OF_TRANSMISSION = 4;
     static private String storageFolderPath;
     static public ArrayList<Database> databases;
@@ -18,19 +20,13 @@ public class DBServer {
     static public Database activeDatabase;
     public static void main(String args[]) throws IOException {
         DBServer server = new DBServer();
-
-        for(Database database : databases){
-            for(Table table : database.tables){
-                System.out.print(table.getTableAsString());
-            }
-        }
         if(!databases.isEmpty()) {
             activeDatabase = databases.get(0);
         }
         server.blockingListenOn(8888);
     }
 
-    static void setupDatabases() throws IOException {
+    static void setupDatabases() throws IOException, GenericException {
         File Databases = new File(storageFolderPath);
         File[] FilesList = Databases.listFiles();
         if(FilesList!=null){
@@ -43,14 +39,7 @@ public class DBServer {
             }
         }
     }
-    /**
-    * KEEP this signature otherwise we won't be able to mark your submission correctly.
-    */
     public DBServer() {
-        databases = new ArrayList<Database>();
-        try{
-            setupDatabases();
-        }catch(Exception IOException){System.out.println("[ERROR] : Unable to set up databases");}
         storageFolderPath = Paths.get("databases").toAbsolutePath().toString();
         try {
             // Create the database storage folder if it doesn't already exist !
@@ -58,18 +47,27 @@ public class DBServer {
         } catch(IOException ioe) {
             System.out.println("Can't seem to create database storage folder " + storageFolderPath);
         }
+        databases = new ArrayList<Database>();
+        try{
+            setupDatabases();
+        }catch(IOException | GenericException e){
+            System.out.println("[ERROR] : Unable to set up databases");
+        }
         handler = new CommandHandler();
     }
 
-    /**
-    * KEEP this signature (i.e. {@code edu.uob.DBServer.handleCommand(String)}) otherwise we won't be
-    * able to mark your submission correctly.
-    *
-    * <p>This method handles all incoming DB commands and carries out the required actions.
-    */
-    public String handleCommand(String command) throws IOException {
-        // TODO implement your server logic here
-        return handler.handleNewCommand(command);
+    public String handleCommand(String command){
+        // TODO impliment the right case sensitivity!!!
+        String returnString = "[ERROR] : Unknown error";
+        try{
+            returnString = handler.handleNewCommand(command);
+        }catch(GenericException e){
+            return e.toString();
+        }
+        catch(IOException e){
+            return "[ERROR] : IOException";
+        }
+        return returnString;
     }
 
     //  === Methods below handle networking aspects of the project - you will not need to change these ! ===
@@ -82,7 +80,6 @@ public class DBServer {
                     blockingHandleConnection(s);
                 } catch (IOException e) {
                     System.err.println("Server encountered a non-fatal IO error:");
-                    e.printStackTrace();
                     System.err.println("Continuing...");
                 }
             }

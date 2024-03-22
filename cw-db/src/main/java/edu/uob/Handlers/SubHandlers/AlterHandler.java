@@ -1,53 +1,60 @@
-package edu.uob;
+package edu.uob.Handlers.SubHandlers;
+
+import edu.uob.Handlers.Conditions.ConditionHandler;
+import edu.uob.Handlers.Handler;
+import edu.uob.Utilities.GenericException;
 
 import java.util.ArrayList;
 
-public class AlterHandler extends Handler{
+public class AlterHandler extends Handler {
     private int AlterationType;
-    AlterHandler(ArrayList<String> Input){
+    public AlterHandler(ArrayList<String> Input){
         tokens = Input;
     }
     public String handleAlter() throws GenericException {
         CurrentToken=0;
         IncrementToken();
-        if(!ActiveToken.equals("TABLE")){throw new GenericException("[ERROR] : Only table alters are permitted") ;}
+        if(!ActiveToken.equalsIgnoreCase("TABLE")){throw new GenericException("[ERROR] : Only table alters are permitted") ;}
         IncrementToken();
-        if((activeTable = isTable(activeTable))==null){throw new GenericException("[ERROR] : Table not valid");}
+        if((activeTable = isTable(activeTable))==null){throw new GenericException("[ERROR] : Invalid table");}
         IncrementToken();
-        if((AlterationType=whatAlteration())==0){throw new GenericException("[ERROR] : Invalid alteration type");}
+        AlterationType=whatAlteration();
         IncrementToken();
-        if(!alterAttribute()){return "[ERROR] : Unable to alter table";}
+        alterAttribute();
         IncrementToken();
         if(!ActiveToken.equals(";")){return "[ERROR] : Missing or misplaced ';'";}
         return "[OK] \nTable Altered successfully \n" + activeTable.getTableAsString();
     }
-    private boolean alterAttribute(){
-        switch(AlterationType) {
-            case 1:
+    private int whatAlteration() throws GenericException {
+        return switch (ActiveToken.toUpperCase()) {
+            case "ADD" -> 1;
+            case "DROP" -> 2;
+            default -> throw new GenericException("[ERROR] : Invalid alteration type");
+        };
+    }
+    private void alterAttribute() throws GenericException {
+        testNotKeyword();
+        switch (AlterationType) {
+            case 1 -> {
                 for (String title : activeTable.columnNames) {
                     if (ActiveToken.equals(title)) {
-                        return false;
+                        throw new GenericException("[ERROR] : Column already exists");
                     }
                 }
                 activeTable.addColumn(ActiveToken);
-                return true;
-            case 2:
+            }
+            case 2 -> {
                 for (String title : activeTable.columnNames) {
                     if (ActiveToken.equals(title)) {
                         activeTable.removeColumn(title);
-                        return true;
+                        return;
                     }
                 }
-                return false;
-            default:
-                return false;
+                throw new GenericException("[ERROR] : Column does not exist");
+            }
         }
     }
-    private int whatAlteration(){
-        return switch (ActiveToken) {
-            case "ADD" -> 1;
-            case "DROP" -> 2;
-            default -> 0;
-        };
+
+    public static class UpdateHandler extends ConditionHandler {
     }
 }

@@ -1,8 +1,13 @@
-package edu.uob;
+package edu.uob.Handlers;
 
+import edu.uob.DBServer;
+import edu.uob.Utilities.GenericException;
+import edu.uob.DataStructures.Table;
+
+import java.net.Inet4Address;
 import java.util.ArrayList;
 
-abstract class Handler {
+public abstract class Handler {
     enum Modes{
         PLUSNUM,
         MINUSNUM,
@@ -17,9 +22,22 @@ abstract class Handler {
     public Table activeTable;
     String InsertValues;
 
+    public void testNotKeyword() throws GenericException {
+        if(ActiveToken.equalsIgnoreCase("SELECT") ||
+                ActiveToken.equalsIgnoreCase("DATABASE") || ActiveToken.equalsIgnoreCase("TABLE") ||ActiveToken.equalsIgnoreCase("TRUE") ||
+                ActiveToken.equalsIgnoreCase("FALSE") ||ActiveToken.equalsIgnoreCase("ADD") ||ActiveToken.equalsIgnoreCase("DROP") ||
+                ActiveToken.equalsIgnoreCase("CREATE") ||ActiveToken.equalsIgnoreCase("INSERT") ||ActiveToken.equalsIgnoreCase("UPDATE") ||
+                ActiveToken.equalsIgnoreCase("SET") ||ActiveToken.equalsIgnoreCase("WHERE") ||ActiveToken.equalsIgnoreCase("DELETE") ||
+                ActiveToken.equalsIgnoreCase("FROM") ||ActiveToken.equalsIgnoreCase("JOIN") ||ActiveToken.equalsIgnoreCase("AND") ||
+                ActiveToken.equalsIgnoreCase("OR") ||ActiveToken.equalsIgnoreCase("ON") ||ActiveToken.equalsIgnoreCase("LIKE") ||
+                ActiveToken.equalsIgnoreCase("USE") ||ActiveToken.equalsIgnoreCase("ALTER") ||ActiveToken.equalsIgnoreCase("INTO") ||
+                ActiveToken.equalsIgnoreCase("VALUES")){
+            throw new GenericException("[ERROR] : Cannot use keyword as table,database or attribute title");
+        }
+    }
 
     //need to catch overflows here !!1
-    public void IncrementToken() throws GenericException{
+    public void IncrementToken() throws GenericException {
         try {
             ActiveToken = tokens.get(++CurrentToken);
         }catch(Exception e){
@@ -48,7 +66,7 @@ abstract class Handler {
     }
 
     public boolean isBooleanLiteral(){
-        if(!(ActiveToken.equals("TRUE")||ActiveToken.equals("FALSE"))){return false;}
+        if(!(ActiveToken.equalsIgnoreCase("TRUE")||ActiveToken.equalsIgnoreCase("FALSE"))){return false;}
         InsertValues+=ActiveToken + "\t";
         return true;
     }
@@ -78,14 +96,14 @@ abstract class Handler {
         InsertValues+=bufferValue + "\t";
         return true;
     }
-    public Table isTable(Table inpActiveTable){
+    public Table isTable(Table inpActiveTable) throws GenericException {
         for(Table table : DBServer.activeDatabase.tables){
             if((ActiveToken).equals(table.getName())){
                 System.out.println(table.getName());
                 return table;
             }
         }
-        return null;
+        throw new GenericException("[ERROR] : Not a valid table");
     }
     private boolean notValFirstValue(String buffer) {
         char firstValue =ActiveToken.charAt(0);
@@ -101,6 +119,19 @@ abstract class Handler {
         }
         else{
             return true;
+        }
+    }
+    public void checkAttributeExists(String attribute,ArrayList<Integer> attributeIndexList) throws GenericException {
+        boolean foundValue = false;
+        for (int i = 0; i < activeTable.getNumberOfColumns(); i++) {
+            String title = activeTable.columnNames.get(i);
+            if (attribute.equals(title)) {
+                attributeIndexList.add(i);
+                foundValue = true;
+            }
+        }
+        if (!foundValue) {
+            throw new GenericException("[ERROR] : That attribute is not in scope");
         }
     }
 }

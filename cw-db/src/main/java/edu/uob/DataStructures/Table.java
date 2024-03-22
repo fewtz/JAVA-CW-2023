@@ -1,8 +1,12 @@
-package edu.uob;
+package edu.uob.DataStructures;
 
+
+import edu.uob.Utilities.GenericException;
+import edu.uob.Utilities.valueType;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import java.io.*;
@@ -11,8 +15,7 @@ import java.io.*;
 public class Table {
     private int numberOfRows;
     private int numberOfColumns;
-    public String[] columnNames;
-    private int colNamesSize;
+    public ArrayList<String> columnNames;
     private BufferedReader buffReader;
     public ArrayList<DataRow> DataList;
     private String TableName;
@@ -21,24 +24,25 @@ public class Table {
     public ArrayList<valueType> typesOfValues;
     public boolean isEmpty = true;
     //linked list....
-    Table(String Name,File inputFile){
+    public Table(String Name, File inputFile){
         TableName = Name;
         tableFile = inputFile;
         numberOfColumns = 0;
         numberOfRows = 0;
-        DataList = new ArrayList<DataRow>();
-        colNamesSize = 10;
-        columnNames = new String[colNamesSize];
+        DataList = new ArrayList<>();
+        columnNames = new ArrayList<>();
         TableAsString = "";
     }
-    public String getSpecificColumnNames(ArrayList<Integer> indecies){
-        String returnString = "";
-        for(Integer i : indecies){
-            returnString += columnNames[i] + " ";
-        }
-        returnString+="\n";
-        return returnString;
+    public String getName(){
+        return TableName;
     }
+    public int getNumberOfColumns() {
+        return numberOfColumns;
+    }
+    public String getTableAsString(){
+        return TableAsString;
+    }
+
     public void updateTableString(){
         String newTableString = "";
         for(String title : columnNames){
@@ -54,61 +58,12 @@ public class Table {
         }
         TableAsString = newTableString;
     }
-    public String getName(){
-        return TableName;
-    }
-    public void addColumn(String title){
-        columnNames[numberOfColumns++] = title;
-
-        for(DataRow datarow : DataList){
-            datarow.addValue("*");
-        }
-        updateTableString();
-    }
-    public void removeColumn(String title){
-        for(int i=0;i<numberOfColumns;i++){
-            String colName = columnNames[i];
-            if(colName.equals(title)){
-                removeFromList(columnNames,i,numberOfColumns--);
-                removeDataPoints(i);
-            }
-        }
-
-        updateTableString();
-    }
-    public boolean insertValues(String values){
-        DataRow dataRow = new DataRow();
-        if(!dataRow.initialise(values, numberOfColumns,numberOfRows++)){ return false;}
-        if(!isEmpty) {
-            if(!dataRow.checkTypes(typesOfValues)){return false;}
-        }
-        isEmpty = false;
-        DataList.add(dataRow);
-        updateTableString();
-        return true;
-    }
-    private void removeDataPoints(int i){
-        for(DataRow datarow : DataList){
-            datarow.removeValue(i);
-        }
-        updateTableString();
-    }
-    private void removeFromList(String[] list, int i,int listSize){
-        while(i<listSize-1) {
-            list[i++] = list[i+1];
-        }
-        updateTableString();
-    }
-    public void createTableFromFiles(BufferedReader inpBuffReader,File inputFile) throws IOException {
+    public void createTableFromFiles(BufferedReader inpBuffReader,File inputFile) throws IOException, GenericException {
         buffReader = inpBuffReader;
         makeColumns(buffReader.readLine());
         TableName = TableName.substring(0,TableName.length()-4);
         readData();
     }
-    public int getNumberOfColumns() {
-        return numberOfColumns;
-    }
-
     private void makeColumns(String firstLine){
         String colName = "";
         char currentChar;
@@ -121,22 +76,15 @@ public class Table {
                 colName += currentChar;
             }
             else{
-                columnNames[numberOfColumns++] = colName;
+                columnNames.add(colName);
                 TableAsString += colName + "\t";
                 colName = "";
-                if(numberOfColumns>=colNamesSize){
-                    makeNamesArrayBigger();
-                }
             }
         }
         TableAsString += "\n";
+        numberOfColumns = columnNames.size();
     }
-    private void makeNamesArrayBigger(){
-        String[] newList = new String[colNamesSize*2];
-        System.arraycopy(columnNames, 0, newList, 0, columnNames.length);
-        columnNames = newList;
-    }
-    private void readData() throws IOException {
+    private void readData() throws IOException, GenericException {
         String nextLine;
         while(true){
             nextLine = buffReader.readLine();
@@ -146,31 +94,67 @@ public class Table {
             AddRow(nextLine);
         }
     }
-    private void AddRow(String Input){
+    private void AddRow(String Input) throws GenericException {
         DataRow newRow = new DataRow();
-        newRow.initialise(Input,numberOfColumns,numberOfRows);
+        newRow.initialise(Input,numberOfColumns,numberOfRows,true);
         TableAsString += newRow.getDataRowAsString();
         DataList.add(newRow);
         numberOfRows++;
         updateTableString();
         isEmpty = false;
-        typesOfValues = DataList.get(0).getTypeList();
-        newRow.setTypeList(typesOfValues);
+        newRow.setTypeList((newRow.getTypeList()));
     }
-    public String getTableAsString(){
-        return TableAsString;
+    public void addColumn(String title){
+        columnNames.add(title);
+        numberOfColumns++;
+        for(DataRow datarow : DataList){
+            datarow.addValue("*");
+        }
+        updateTableString();
     }
-
-    public boolean writeToDisk(){
+    public void removeColumn(String title){
+        for(int i=0;i<numberOfColumns;i++){
+            String colName = columnNames.get(i);
+            if(colName.equals(title)){
+                columnNames.remove(colName);
+                removeDataPoints(i);
+            }
+        }
+        numberOfColumns--;
+        updateTableString();
+    }
+    private void removeDataPoints(int i){
+        for(DataRow datarow : DataList){
+            datarow.removeValue(i);
+        }
+        updateTableString();
+    }
+    public void insertValues(String values) throws GenericException {
+        DataRow dataRow = new DataRow();
+        dataRow.initialise(values, numberOfColumns,numberOfRows++,false);
+        if(!isEmpty) {
+            dataRow.checkTypes(typesOfValues);
+        }
+        isEmpty = false;
+        DataList.add(dataRow);
+        updateTableString();
+    }
+    public String getSpecificColumnNames(ArrayList<Integer> indecies){
+        String returnString = "";
+        for(Integer i : indecies){
+            returnString += columnNames.get(i) + " ";
+        }
+        returnString+="\n";
+        return returnString;
+    }
+    public void writeToDisk() throws GenericException{
         updateTableString();
         try {
             FileWriter fileWriter = new FileWriter(tableFile,false);
             fileWriter.write(TableAsString);
             fileWriter.close();
         }catch(Exception IOException){
-            System.out.println("[ERROR] : Unable to write to file");
-            return false;
+            throw new GenericException("[ERROR] : Unable to write to disk");
         }
-        return true;
     }
 }

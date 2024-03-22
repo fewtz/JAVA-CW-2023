@@ -1,4 +1,9 @@
-package edu.uob;
+package edu.uob.Handlers.Conditions;
+import edu.uob.DataStructures.DataRow;
+import edu.uob.Utilities.StringUtils;
+import edu.uob.DataStructures.Table;
+import edu.uob.Utilities.valueType;
+
 import java.util.ArrayList;
 
 public class Comparison {
@@ -10,8 +15,10 @@ public class Comparison {
         GREATERTHANEQUALTO,
         EQUALTO,
         NOTEQUALTO,
+        LIKE,
     };
     comparison comparisonType;
+    String valueToken;
     String attribute;
     valueType typeOfValue;
     int ValueInt=0;
@@ -21,11 +28,11 @@ public class Comparison {
     Table activeTable;
     int attributeIndex;
     public ArrayList<String> validIDList;
-    Comparison(){}
+    public Comparison(){}
     public boolean evaluate(){
         validIDList = new ArrayList<String>();
         for(DataRow dataRow : activeTable.DataList){
-            if(typeOfValue!=dataRow.datapointsTypes.get(attributeIndex)){return true;}
+            //if(typeOfValue!=dataRow.datapointsTypes.get(attributeIndex)){return true;}
             switch(typeOfValue){
                 case INTEGER -> testInteger(dataRow);
                 case BOOLEAN -> testBoolean(dataRow);
@@ -35,24 +42,22 @@ public class Comparison {
         }
         return true;
     }
-    public void printIDs() {
-        for (String ID : validIDList) {
-            System.out.println(ID);
-        }
-    }
     private void testString(DataRow dataRow){
         switch (comparisonType) {
             case EQUALTO -> {
-                if (dataRow.DataPoints.get(attributeIndex).equals(ValueString)) {
+                if (dataRow.DataPoints.get(attributeIndex).equalsIgnoreCase(ValueString)) {
                     validIDList.add(dataRow.DataPoints.get(0));
                 }
-                return;
             }
             case NOTEQUALTO -> {
-                if (!dataRow.DataPoints.get(attributeIndex).equals(ValueString)) {
+                if (!dataRow.DataPoints.get(attributeIndex).equalsIgnoreCase(ValueString)) {
                     validIDList.add(dataRow.DataPoints.get(0));
                 }
-                return;
+            }
+            case LIKE -> {
+                if (dataRow.DataPoints.get(attributeIndex).equals(ValueString)){
+                    validIDList.add(dataRow.DataPoints.get(0));
+                }
             }
         }
     }
@@ -62,13 +67,16 @@ public class Comparison {
                 if (Boolean.parseBoolean(dataRow.DataPoints.get(attributeIndex)) == ValueBoolean) {
                     validIDList.add(dataRow.DataPoints.get(0));
                 }
-                return;
             }
             case NOTEQUALTO -> {
                 if (Boolean.parseBoolean(dataRow.DataPoints.get(attributeIndex)) != ValueBoolean) {
                     validIDList.add(dataRow.DataPoints.get(0));
                 }
-                return;
+            }
+            case LIKE -> {
+                if (dataRow.DataPoints.get(attributeIndex).equals(ValueString)){
+                    validIDList.add(dataRow.DataPoints.get(0));
+                }
             }
         }
     }
@@ -78,37 +86,36 @@ public class Comparison {
                 if (Float.parseFloat(dataRow.DataPoints.get(attributeIndex)) == ValueFloat) {
                     validIDList.add(dataRow.DataPoints.get(0));
                 }
-                return;
             }
             case NOTEQUALTO -> {
                 if (Float.parseFloat(dataRow.DataPoints.get(attributeIndex)) != ValueFloat) {
                     validIDList.add(dataRow.DataPoints.get(0));
                 }
-                return;
             }
             case LESSTHAN -> {
                 if (Float.parseFloat(dataRow.DataPoints.get(attributeIndex)) < ValueFloat) {
                     validIDList.add(dataRow.DataPoints.get(0));
                 }
-                return;
             }
             case GREATERTHAN -> {
                 if (Float.parseFloat(dataRow.DataPoints.get(attributeIndex)) > ValueFloat) {
                     validIDList.add(dataRow.DataPoints.get(0));
                 }
-                return;
             }
             case LESSTHANEQUALTO -> {
                 if (Float.parseFloat(dataRow.DataPoints.get(attributeIndex)) <= ValueFloat) {
                     validIDList.add(dataRow.DataPoints.get(0));
                 }
-                return;
             }
             case GREATERTHANEQUALTO -> {
                 if (Float.parseFloat(dataRow.DataPoints.get(attributeIndex)) >= ValueFloat) {
                     validIDList.add(dataRow.DataPoints.get(0));
                 }
-                return;
+            }
+            case LIKE -> {
+                if (dataRow.DataPoints.get(attributeIndex).equals(ValueString)){
+                    validIDList.add(dataRow.DataPoints.get(0));
+                }
             }
         }
     }
@@ -118,45 +125,45 @@ public class Comparison {
                 if (Integer.parseInt(dataRow.DataPoints.get(attributeIndex)) == ValueInt) {
                     validIDList.add(dataRow.DataPoints.get(0));
                 }
-                return;
             }
             case NOTEQUALTO -> {
                 if (Integer.parseInt(dataRow.DataPoints.get(attributeIndex)) != ValueInt) {
                     validIDList.add(dataRow.DataPoints.get(0));
                 }
-                return;
             }
             case LESSTHAN -> {
                 if (Integer.parseInt(dataRow.DataPoints.get(attributeIndex)) < ValueInt) {
                     validIDList.add(dataRow.DataPoints.get(0));
                 }
-                return;
             }
             case GREATERTHAN -> {
                 if (Integer.parseInt(dataRow.DataPoints.get(attributeIndex)) > ValueInt) {
                     validIDList.add(dataRow.DataPoints.get(0));
                 }
-                return;
             }
             case LESSTHANEQUALTO -> {
                 if (Integer.parseInt(dataRow.DataPoints.get(attributeIndex)) <= ValueInt) {
                     validIDList.add(dataRow.DataPoints.get(0));
                 }
-                return;
             }
             case GREATERTHANEQUALTO -> {
                 if (Integer.parseInt(dataRow.DataPoints.get(attributeIndex)) >= ValueInt) {
                     validIDList.add(dataRow.DataPoints.get(0));
                 }
-                return;
+            }
+            case LIKE -> {
+                if (dataRow.DataPoints.get(attributeIndex).equals(ValueString)){
+                    validIDList.add(dataRow.DataPoints.get(0));
+                }
             }
         }
     }
     public boolean addValue(String value){
+        ValueString = value;
         StringBuilder bufferBuilder = new StringBuilder();
         if(StringUtils.isBooleanLiteral(value)){
             typeOfValue = valueType.BOOLEAN;
-            ValueBoolean = value.equals("TRUE");
+            ValueBoolean = value.equalsIgnoreCase("TRUE");
             return true;
         }
         if(StringUtils.isIntegerLiteral(value)){
@@ -177,8 +184,7 @@ public class Comparison {
         }
         return false;
     }
-    public boolean addAttribute(String title,Table table,int titleIndex){
-        attribute=title;
+    public boolean addAttribute(Table table,int titleIndex){
         attributeIndex=titleIndex;
         activeTable = table;
         return true;
@@ -201,12 +207,16 @@ public class Comparison {
                 comparisonType = comparison.GREATERTHANEQUALTO;
                 yield true;
             }
-            case "==" -> {
+            case "==", "=" -> {
                 comparisonType = comparison.EQUALTO;
                 yield true;
             }
             case "!=" -> {
                 comparisonType = comparison.NOTEQUALTO;
+                yield true;
+            }
+            case "LIKE" -> {
+                comparisonType = comparison.LIKE;
                 yield true;
             }
             default -> false;

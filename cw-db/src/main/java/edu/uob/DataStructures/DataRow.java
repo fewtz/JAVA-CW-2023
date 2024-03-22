@@ -1,22 +1,26 @@
-package edu.uob;
+package edu.uob.DataStructures;
 
+
+import edu.uob.Utilities.GenericException;
+import edu.uob.Utilities.StringUtils;
+import edu.uob.Utilities.valueType;
 
 import java.util.ArrayList;
 public class DataRow {
 
     private int size;
-    ArrayList<String> DataPoints;
+    public ArrayList<String> DataPoints;
     private String DataRowAsString;
-    ArrayList<valueType> datapointsTypes;
+    public ArrayList<valueType> datapointsTypes;
 
     DataRow(){
         size =0;
         DataPoints = new ArrayList<String>();
         DataRowAsString = "";
     }
-    public boolean initialise(String Input,int DesiredSize,int positionInTable){
-        MakeRow(Input,positionInTable);
-        return CheckSize(DesiredSize);
+    public void initialise(String Input,int DesiredSize,int positionInTable,boolean fromFile) throws GenericException {
+        MakeRow(Input,positionInTable,fromFile);
+        CheckSize(DesiredSize);
     }
     public void setTypeList(ArrayList<valueType> inputList){
         datapointsTypes = inputList;
@@ -29,16 +33,15 @@ public class DataRow {
         }
         return datapointsTypes;
     }
-    public boolean checkTypes(ArrayList<valueType> inputList){
+    public void checkTypes(ArrayList<valueType> inputList) throws GenericException {
         valueType type;
         String value;
         for(int i=0;i<size;i++){
             value = DataPoints.get(i);
             type = inputList.get(i);
-            if(!type.equals(StringUtils.checkType(value))){return false;}
+            if(!type.equals(StringUtils.checkType(value))){}//throw new GenericException("[ERROR] : Incorrect type insertion");}
         }
         datapointsTypes = inputList;
-        return true;
     }
     public void addValue(String datapoint){
         DataPoints.add(datapoint);
@@ -50,11 +53,13 @@ public class DataRow {
         }
         size--;
     }
-    private void MakeRow(String Input,int positionInTable){
+    private void MakeRow(String Input,int positionInTable,boolean fromFile){
         datapointsTypes = new ArrayList<valueType>();
         String datapoint = "";
-        DataPoints.add(Integer.toString(positionInTable));
-        datapointsTypes.add(valueType.INTEGER);
+        if(!fromFile) {
+            DataPoints.add(Integer.toString(positionInTable));
+            datapointsTypes.add(valueType.INTEGER);
+        }
         char currentChar;
         for(int i=0;i<Input.length();i++) {
             currentChar = Input.charAt(i);
@@ -87,8 +92,8 @@ public class DataRow {
         }
         datapointsTypes.add(valueType.STRING);
     }
-    private boolean CheckSize(int DesiredSize){
-        return DesiredSize==DataPoints.size();
+    private void CheckSize(int DesiredSize) throws GenericException{
+        if(DesiredSize!=DataPoints.size()){throw new GenericException("[ERROR] : Invalid datarow size");}
     }
     public String getDataRowAsString(){
         return DataRowAsString;
@@ -102,9 +107,9 @@ public class DataRow {
         }
         DataRowAsString = newRowString;
     }
-    public String getSpecificDataRowValues(ArrayList<Integer> indecies){
+    public String getSpecificDataRowValues(ArrayList<Integer> indicies){
         String returnString = "";
-        for(Integer i : indecies){
+        for(Integer i : indicies){
             returnString += DataPoints.get(i) + "\t";
         }
         returnString += "\n";

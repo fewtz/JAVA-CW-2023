@@ -1,19 +1,19 @@
-package edu.uob;
+package edu.uob.DataStructures;
+
+import edu.uob.Utilities.GenericException;
+
 import java.io.*;
-import java.util.ArrayList;
-import java.nio.file.Paths;
-import java.nio.file.Files;
 import java.util.ArrayList;
 
 public class Database {
-    ArrayList<Table> tables;
-    String Name;
-    File dataBaseFile;
-    Database(String inputName){
+    public ArrayList<Table> tables;
+    public String Name;
+    public File dataBaseFile;
+    public Database(String inputName){
         Name = inputName;
         tables = new ArrayList<Table>();
     }
-    public void createDatabaseFromFiles(File DatabaseDirectory) throws IOException {
+    public void createDatabaseFromFiles(File DatabaseDirectory) throws IOException, GenericException {
         tables = new ArrayList<Table>();
         dataBaseFile = DatabaseDirectory;
         File[] FilesList = DatabaseDirectory.listFiles();
@@ -28,7 +28,7 @@ public class Database {
     public String getName(){
         return Name;
     }
-    private void readFile(File file) throws IOException {
+    private void readFile(File file) throws IOException, GenericException {
         if(file!=null) {
             BufferedReader buffReader;
             try {

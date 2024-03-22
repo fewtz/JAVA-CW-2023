@@ -1,8 +1,8 @@
-package edu.uob;
+package edu.uob.Utilities;
 
 public class GenericException extends Exception{
     String message;
-    GenericException(String errorMessage){
+    public GenericException(String errorMessage){
         message = errorMessage;
     }
     @Override

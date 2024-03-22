@@ -1,4 +1,4 @@
-package edu.uob;
+package edu.uob.Handlers.Conditions;
 
 import java.util.ArrayList;
 
@@ -11,15 +11,13 @@ public class ComboComparison {
         AND,
         OR,
     }
-
-    ;
     boolType comparisonType;
 
     ComboComparison() {
     }
 
     public void addBooleanType(String input) {
-        if (input.equals("AND")) {
+        if (input.equalsIgnoreCase("AND")) {
             comparisonType = boolType.AND;
         } else {
             comparisonType = boolType.OR;

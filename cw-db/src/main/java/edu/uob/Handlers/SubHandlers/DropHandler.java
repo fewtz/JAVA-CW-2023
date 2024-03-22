@@ -1,19 +1,25 @@
-package edu.uob;
+package edu.uob.Handlers.SubHandlers;
+
+import edu.uob.DBServer;
+import edu.uob.DataStructures.Database;
+import edu.uob.Handlers.Handler;
+import edu.uob.Utilities.GenericException;
+import edu.uob.DataStructures.Table;
 
 import java.util.ArrayList;
 import java.io.*;
 
 public class DropHandler extends Handler {
-    DropHandler(ArrayList<String> Input){
+    public DropHandler(ArrayList<String> Input){
         tokens = Input;
     }
-    public String handleDrop() throws GenericException {
+    public String handleDrop() throws GenericException, IOException {
         CurrentToken = 0;
         IncrementToken();
         return switch (checkDataType()) {
             case 1 -> dropDatabase();
             case 2 -> dropTable();
-            default -> "[ERROR] : Invalid drop type";
+            default -> throw new GenericException( "[ERROR] : Invalid drop type");
         };
     }
     private String dropDatabase() throws GenericException {
@@ -24,20 +30,20 @@ public class DropHandler extends Handler {
                 databaseToDrop = database;
             }
         }
-        if(databaseToDrop==null){return "[ERROR] : Invalid database name";}
+        if(databaseToDrop==null){throw new GenericException("[ERROR] : Database to delete does not exist in scope") ;}
         File databaseToDeleteFile = databaseToDrop.dataBaseFile;
         File[] allContents = databaseToDeleteFile.listFiles();
         if (allContents != null) {
             for (File file : allContents) {
                 System.out.println(file.getName());
-                if(!file.delete()){return "[ERROR] : Unable to delete file in database";}
+                if(!file.delete()){throw new GenericException("[ERROR] : File inside database could not be deleted");}
             }
         }
-        if(!databaseToDeleteFile.delete()){return "[ERROR] : Unable to delete database";}
+        if(!databaseToDeleteFile.delete()){throw new GenericException("[ERROR] : Database could not be deleted");}
         DBServer.databases.remove(databaseToDrop);
         return "[OK] \n Database removed: "+ActiveToken;
     }
-    private String dropTable() throws GenericException {
+    private String dropTable() throws GenericException,IOException {
         IncrementToken();
         Table tableToDelete=null;
         for(Table table : DBServer.activeDatabase.tables){
@@ -45,16 +51,16 @@ public class DropHandler extends Handler {
                 tableToDelete = table;
             }
         }
-        if(tableToDelete == null){return "[ERROR] : Table does not exist in scope";}
-        if(!tableToDelete.tableFile.delete()){return "[ERROR] : Unable to delete table";}
+        if(tableToDelete == null){throw new GenericException("[ERROR] : Table to delete does not exist in scope") ;}
+        if(!tableToDelete.tableFile.delete()){throw new GenericException("[ERROR] : Table could not be deleted");}
         DBServer.activeDatabase.tables.remove(tableToDelete);
         return "[OK] \nTable removed: "+ActiveToken;
     }
     private int checkDataType(){
-        if(ActiveToken.equals("DATABASE")){
+        if(ActiveToken.equalsIgnoreCase("DATABASE")){
             return 1;
         }
-        if(ActiveToken.equals("TABLE")){
+        if(ActiveToken.equalsIgnoreCase("TABLE")){
             return 2;
         }
         return 0;

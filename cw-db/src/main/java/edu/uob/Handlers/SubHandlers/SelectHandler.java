@@ -1,48 +1,39 @@
-package edu.uob;
+package edu.uob.Handlers.SubHandlers;
 
-import java.lang.reflect.Array;
+import edu.uob.DataStructures.DataRow;
+import edu.uob.Handlers.Conditions.ConditionHandler;
+import edu.uob.DataStructures.Table;
+import edu.uob.Utilities.GenericException;
+
 import java.util.ArrayList;
 
-public class SelectHandler extends ConditionHandler{
+public class SelectHandler extends ConditionHandler {
     Table activeTable;
     ArrayList<Integer> attributeIndexList;
     ArrayList<String> attributeStringList = new ArrayList<String>();
     boolean wildList=false;
-    boolean isList=false;
-    SelectHandler(ArrayList<String> Input) {
+    public SelectHandler(ArrayList<String> Input) {
         tokens = Input;
     }
-    public String handleSelect(){
+    public String handleSelect() throws GenericException {
         CurrentToken =0;
-        if(!isAttributeList()){return "[ERROR] : That is not a valid attribute list";}
+        checkAttributeList();
+        if(!ActiveToken.equalsIgnoreCase("FROM")){throw new GenericException("[ERROR] : Expected token 'FROM'") ;}
         IncrementToken();
-        if(!ActiveToken.equals("FROM")){return "[ERROR] : That is not a valid select command";}
+        activeTable = isTable(activeTable);
         IncrementToken();
-        if((activeTable = isTable(activeTable))==null){return "[ERROR] : That is not a valid table name";}
+        generateAttributeIndexes();
+        if(ActiveToken.equalsIgnoreCase(";")){return pushAll();}
+        if(!ActiveToken.equalsIgnoreCase("WHERE")){throw new GenericException("[ERROR] : Expected token 'WHERE'");}
         IncrementToken();
-        if(!generateAttributeIndexes()){return "[ERROR] : That attribute is not in scope";}
-        if(ActiveToken.equals(";")){return pushAll();}
-        if(!ActiveToken.equals("WHERE")){return "[ERROR] : That is not a valid select command";}
-        IncrementToken();
-        if(!validConditions()){return "[ERROR] : That is not a valid condition";}
+        checkValidConditions(activeTable);
         return pushSelected();
     }
-    private boolean generateAttributeIndexes(){
-        attributeIndexList = new ArrayList<Integer>();
-        boolean foundValue;
+    private void generateAttributeIndexes() throws GenericException {
+        attributeIndexList = new ArrayList<>();
         if(!wildList) {
             for (String attribute : attributeStringList) {
-                foundValue = false;
-                for (int i = 0; i < activeTable.getNumberOfColumns(); i++) {
-                    String title = activeTable.columnNames[i];
-                    if (attribute.equals(title)) {
-                        attributeIndexList.add(i);
-                        foundValue = true;
-                    }
-                }
-                if (!foundValue) {
-                    return false;
-                }
+                checkAttributeExists(attribute,attributeIndexList);
             }
         }
         else{
@@ -50,7 +41,6 @@ public class SelectHandler extends ConditionHandler{
                 attributeIndexList.add(i);
             }
         }
-        return true;
     }
     private String pushSelected(){
         String output = "[OK] \n";
@@ -68,41 +58,18 @@ public class SelectHandler extends ConditionHandler{
         }
         return output;
     }
-    private boolean isAttributeList(){
+    private void checkAttributeList() throws GenericException {
         IncrementToken();
-        if(!isList) {
-            if (ActiveToken.equals("*")) {
-                return wildList = true;
-            }
-            if (isPlainText()) {
-                attributeStringList.add(ActiveToken);
-                return true;
-            }
-        }
-        if(ActiveToken.equals("(")){isList = true;}
-        if(isList) {
-            if (!isPlainText()) {
-                return false;
-            }
-            attributeStringList.add(ActiveToken);
+        if (ActiveToken.equals("*")) {
+            wildList = true;
             IncrementToken();
-            if (ActiveToken.equals(",")) {
-                return isAttributeList();
-            }
-            return ActiveToken.equals(")");
+            return ;
         }
-        return false;
-    }
-    public boolean validConditions(){
-        if(!parseConditions()){return false;}
-        validRows = new ArrayList<DataRow>();
-        for(DataRow dataRow : activeTable.DataList){
-            for(String validID : comparisonsList.get(0).validIDList){
-                if(dataRow.DataPoints.get(0).equals(validID)){
-                    validRows.add(dataRow);
-                }
-            }
+        if (!isPlainText()) {throw new GenericException("[ERROR] : Invalid attribute list");}
+        attributeStringList.add(ActiveToken);
+        IncrementToken();
+        if (ActiveToken.equals(",")) {
+            checkAttributeList();
         }
-        return true;
     }
 }
