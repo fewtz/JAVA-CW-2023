@@ -18,13 +18,13 @@ public class SelectHandler extends ConditionHandler {
     public String handleSelect() throws GenericException {
         CurrentToken =0;
         checkAttributeList();
-        if(!ActiveToken.equalsIgnoreCase("FROM")){throw new GenericException("[ERROR] : Expected token 'FROM'") ;}
+        compareToken(ActiveToken,"FROM");
         IncrementToken();
-        activeTable = isTable(activeTable);
+        activeTable = isTable();
         IncrementToken();
         generateAttributeIndexes();
         if(ActiveToken.equalsIgnoreCase(";")){return pushAll();}
-        if(!ActiveToken.equalsIgnoreCase("WHERE")){throw new GenericException("[ERROR] : Expected token 'WHERE'");}
+        compareToken(ActiveToken,"WHERE");
         IncrementToken();
         checkValidConditions(activeTable);
         return pushSelected();
@@ -33,7 +33,7 @@ public class SelectHandler extends ConditionHandler {
         attributeIndexList = new ArrayList<>();
         if(!wildList) {
             for (String attribute : attributeStringList) {
-                checkAttributeExists(attribute,attributeIndexList);
+                checkAttributeExists(attribute,attributeIndexList,activeTable);
             }
         }
         else{
@@ -42,7 +42,7 @@ public class SelectHandler extends ConditionHandler {
             }
         }
     }
-    private String pushSelected(){
+    private String pushSelected() throws GenericException {
         String output = "[OK] \n";
         output += activeTable.getSpecificColumnNames(attributeIndexList);
         for(DataRow dataRow : validRows){
@@ -50,7 +50,7 @@ public class SelectHandler extends ConditionHandler {
         }
         return output;
     }
-    private String pushAll(){
+    private String pushAll() throws GenericException {
         String output = "[OK]\n";
         output += activeTable.getSpecificColumnNames(attributeIndexList);
         for(DataRow dataRow : activeTable.DataList){

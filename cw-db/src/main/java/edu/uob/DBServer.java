@@ -85,7 +85,6 @@ public class DBServer {
             }
         }
     }
-
     private void blockingHandleConnection(ServerSocket serverSocket) throws IOException {
         try (Socket s = serverSocket.accept();
         BufferedReader reader = new BufferedReader(new InputStreamReader(s.getInputStream()));

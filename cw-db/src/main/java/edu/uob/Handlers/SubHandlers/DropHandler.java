@@ -22,6 +22,8 @@ public class DropHandler extends Handler {
             default -> throw new GenericException( "[ERROR] : Invalid drop type");
         };
     }
+
+    //TODO clean this up
     private String dropDatabase() throws GenericException {
         IncrementToken();
         Database databaseToDrop=null;

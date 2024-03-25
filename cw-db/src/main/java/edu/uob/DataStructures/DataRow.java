@@ -6,15 +6,13 @@ import edu.uob.Utilities.StringUtils;
 import edu.uob.Utilities.valueType;
 
 import java.util.ArrayList;
-public class DataRow {
+public class DataRow implements java.io.Serializable{
 
-    private int size;
     public ArrayList<String> DataPoints;
     private String DataRowAsString;
     public ArrayList<valueType> datapointsTypes;
 
     DataRow(){
-        size =0;
         DataPoints = new ArrayList<String>();
         DataRowAsString = "";
     }
@@ -36,7 +34,7 @@ public class DataRow {
     public void checkTypes(ArrayList<valueType> inputList) throws GenericException {
         valueType type;
         String value;
-        for(int i=0;i<size;i++){
+        for(int i=0;i<DataPoints.size();i++){
             value = DataPoints.get(i);
             type = inputList.get(i);
             if(!type.equals(StringUtils.checkType(value))){}//throw new GenericException("[ERROR] : Incorrect type insertion");}
@@ -47,11 +45,10 @@ public class DataRow {
         DataPoints.add(datapoint);
     }
     public void removeValue(int i){
-        while(i<size){
+        while(i<DataPoints.size()){
             DataPoints.set(i,DataPoints.get(i+1));
             i++;
         }
-        size--;
     }
     private void MakeRow(String Input,int positionInTable,boolean fromFile){
         datapointsTypes = new ArrayList<valueType>();
@@ -63,17 +60,30 @@ public class DataRow {
         char currentChar;
         for(int i=0;i<Input.length();i++) {
             currentChar = Input.charAt(i);
-            if (currentChar != '\t') {
+            if (currentChar != '\t'&& currentChar!='\n' && currentChar!='\0') {
                 datapoint += currentChar;
             } else {
-                //INSERT DATAPOINT
-                StringBuilder temp = new StringBuilder();
-                if(StringUtils.isStringLiteral(datapoint,temp)){datapoint=temp.toString();}
-                DataPoints.add(datapoint);
-                addTypeList(datapoint);
-                DataRowAsString += datapoint +"\t";
-                datapoint = "";
+                if(!datapoint.isEmpty()) {
+                    StringBuilder temp = new StringBuilder();
+                    if (StringUtils.isStringLiteral(datapoint, temp)) {
+                        datapoint = temp.toString();
+                    }
+                    DataPoints.add(datapoint);
+                    addTypeList(datapoint);
+                    DataRowAsString += datapoint + "\t";
+                    datapoint = "";
+                }
             }
+        }
+        if(!datapoint.isEmpty()) {
+            StringBuilder temp = new StringBuilder();
+            if (StringUtils.isStringLiteral(datapoint, temp)) {
+                datapoint = temp.toString();
+            }
+            DataPoints.add(datapoint);
+            addTypeList(datapoint);
+            DataRowAsString += datapoint + "\t";
+            datapoint = "";
         }
         DataRowAsString += "\n";
     }
@@ -107,12 +117,32 @@ public class DataRow {
         }
         DataRowAsString = newRowString;
     }
-    public String getSpecificDataRowValues(ArrayList<Integer> indicies){
+    public String getSpecificDataRowValues(ArrayList<Integer> indicies) throws GenericException {
         String returnString = "";
         for(Integer i : indicies){
+            if(i>=DataPoints.size()){throw new GenericException("[ERROR] : Target index is outside the size of the datarow");}
             returnString += DataPoints.get(i) + "\t";
         }
         returnString += "\n";
         return returnString;
     }
+    public String getSpecificValue(int index) throws GenericException {
+        if(index>=DataPoints.size()){throw new GenericException("[ERROR] : Target index is outside the size of the datarow");}
+        return DataPoints.get(index);
+    }
+    public void combine(DataRow foreignRow,int  keyAttribute,int foreignKeyAttribute,int index){
+        DataPoints.remove(keyAttribute);
+        if(keyAttribute==0) {
+            DataPoints.add(0, Integer.toString(index));
+        }else{DataPoints.set(0, Integer.toString(index));}
+        for(String value : foreignRow.DataPoints){
+            int foreignIndex = foreignRow.DataPoints.indexOf(value);
+            if(foreignIndex != foreignKeyAttribute && foreignIndex != 0 ){
+                addValue(value);
+            }
+        }
+
+        updateRowString();
+    }
+
 }

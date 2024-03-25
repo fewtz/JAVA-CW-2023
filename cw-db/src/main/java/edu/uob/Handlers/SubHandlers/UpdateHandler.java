@@ -16,12 +16,12 @@ public class UpdateHandler extends ConditionHandler {
     public String handleUpdate() throws GenericException {
         CurrentToken = 0;
         IncrementToken();
-        if((activeTable = isTable(activeTable))==null){throw new GenericException("[ERROR] : Invalid table");}
+        activeTable = isTable();
         IncrementToken();
-        if(!ActiveToken.equalsIgnoreCase("SET")){throw new GenericException("[ERROR] : Expected token 'SET'");}
+        compareToken(ActiveToken,"SET");
         IncrementToken();
         checkNameValueList();
-        if(!ActiveToken.equalsIgnoreCase("WHERE")){throw new GenericException("[ERROR] : Expected token 'WHERE'");}
+        compareToken(ActiveToken,"WHERE");
         IncrementToken();
         checkValidConditions(activeTable);
         pushChanges();
@@ -34,21 +34,23 @@ public class UpdateHandler extends ConditionHandler {
         if(ActiveToken.equals(",")){checkNamePair();}
     }
     private void checkNamePair() throws GenericException {
-        checkAttributeExists(ActiveToken,attributeIndexList);
+        checkAttributeExists(ActiveToken,attributeIndexList,activeTable);
         IncrementToken();
-        if(!ActiveToken.equals("=")){throw new GenericException("[ERROR] : Expected token '='");}
+        compareToken(ActiveToken,"=");
         IncrementToken();
         if(!isValue(new Comparison(),ActiveToken)){throw new GenericException("[ERROR] : Invalid value in name pair list");}
+        if(isStringLiteral()){ActiveToken = ActiveToken.substring(1,ActiveToken.length()-1);}
         values.add(ActiveToken);
     }
 
-    private void pushChanges(){
+    private void pushChanges() throws GenericException {
         for(DataRow dataRow : validRows){
             for(int i = 0;i<attributeIndexList.size();i++) {
                 dataRow.DataPoints.set(attributeIndexList.get(i), values.get(i));
             }
         }
         activeTable.updateTableString();
+        activeTable.writeToDisk();
     }
 
 }

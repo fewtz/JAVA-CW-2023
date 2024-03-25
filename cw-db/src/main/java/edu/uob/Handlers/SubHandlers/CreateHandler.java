@@ -31,13 +31,13 @@ public class CreateHandler extends Handler {
         if(ActiveToken.equalsIgnoreCase("TABLE")){return 2;}
         return 0;
     }
-
+        //TODO clean this up
     private String createDatabase() throws GenericException {
         IncrementToken();
         newDatabaseName = ActiveToken;
         testNotKeyword();
         IncrementToken();
-        if(!ActiveToken.equals(";")){throw new GenericException( "[ERROR] : Missing or misplaced ';'");}
+        compareToken(ActiveToken,";");
         File newDatabaseFile = new File("databases/"+newDatabaseName);
         Database newDatabase = new Database(newDatabaseName);
         if(! (newDatabaseFile.mkdirs())){throw new GenericException( "[ERROR] : Unable to make new database");}

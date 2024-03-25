@@ -14,15 +14,15 @@ public class AlterHandler extends Handler {
     public String handleAlter() throws GenericException {
         CurrentToken=0;
         IncrementToken();
-        if(!ActiveToken.equalsIgnoreCase("TABLE")){throw new GenericException("[ERROR] : Only table alters are permitted") ;}
+        compareToken(ActiveToken,"TABLE");
         IncrementToken();
-        if((activeTable = isTable(activeTable))==null){throw new GenericException("[ERROR] : Invalid table");}
+        activeTable = isTable();
         IncrementToken();
         AlterationType=whatAlteration();
         IncrementToken();
         alterAttribute();
         IncrementToken();
-        if(!ActiveToken.equals(";")){return "[ERROR] : Missing or misplaced ';'";}
+        compareToken(ActiveToken,";");
         return "[OK] \nTable Altered successfully \n" + activeTable.getTableAsString();
     }
     private int whatAlteration() throws GenericException {
@@ -53,8 +53,5 @@ public class AlterHandler extends Handler {
                 throw new GenericException("[ERROR] : Column does not exist");
             }
         }
-    }
-
-    public static class UpdateHandler extends ConditionHandler {
     }
 }

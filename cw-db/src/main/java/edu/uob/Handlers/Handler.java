@@ -96,10 +96,10 @@ public abstract class Handler {
         InsertValues+=bufferValue + "\t";
         return true;
     }
-    public Table isTable(Table inpActiveTable) throws GenericException {
+    public Table isTable() throws GenericException {
         for(Table table : DBServer.activeDatabase.tables){
             if((ActiveToken).equals(table.getName())){
-                System.out.println(table.getName());
+                if(table==null){throw new GenericException("[ERROR] : Attempted to access null table");}
                 return table;
             }
         }
@@ -121,10 +121,10 @@ public abstract class Handler {
             return true;
         }
     }
-    public void checkAttributeExists(String attribute,ArrayList<Integer> attributeIndexList) throws GenericException {
+    public void checkAttributeExists(String attribute,ArrayList<Integer> attributeIndexList,Table table) throws GenericException {
         boolean foundValue = false;
-        for (int i = 0; i < activeTable.getNumberOfColumns(); i++) {
-            String title = activeTable.columnNames.get(i);
+        for (int i = 0; i < table.getNumberOfColumns(); i++) {
+            String title = table.columnNames.get(i);
             if (attribute.equals(title)) {
                 attributeIndexList.add(i);
                 foundValue = true;
@@ -133,5 +133,9 @@ public abstract class Handler {
         if (!foundValue) {
             throw new GenericException("[ERROR] : That attribute is not in scope");
         }
+    }
+
+    public void compareToken(String token, String target) throws GenericException {
+        if(!token.equalsIgnoreCase(target)){throw new GenericException("[ERROR] : Expected token :"+target);}
     }
 }

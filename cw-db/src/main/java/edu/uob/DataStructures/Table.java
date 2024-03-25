@@ -9,20 +9,19 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
+
 import java.io.*;
-
-
-public class Table {
+public class Table implements java.io.Serializable{
     private int numberOfRows;
     private int numberOfColumns;
     public ArrayList<String> columnNames;
-    private BufferedReader buffReader;
     public ArrayList<DataRow> DataList;
     private String TableName;
     private String TableAsString;
     public File tableFile;
     public ArrayList<valueType> typesOfValues;
     public boolean isEmpty = true;
+    private int highestID=1;
     //linked list....
     public Table(String Name, File inputFile){
         TableName = Name;
@@ -37,7 +36,7 @@ public class Table {
         return TableName;
     }
     public int getNumberOfColumns() {
-        return numberOfColumns;
+        return columnNames.size();
     }
     public String getTableAsString(){
         return TableAsString;
@@ -59,10 +58,18 @@ public class Table {
         TableAsString = newTableString;
     }
     public void createTableFromFiles(BufferedReader inpBuffReader,File inputFile) throws IOException, GenericException {
-        buffReader = inpBuffReader;
-        makeColumns(buffReader.readLine());
+        makeColumns(inpBuffReader.readLine());
         TableName = TableName.substring(0,TableName.length()-4);
-        readData();
+        readData(inpBuffReader);
+        updateHighestID();
+    }
+    private void updateHighestID(){
+        for(DataRow dataRow : DataList){
+            int ID = Integer.parseInt(dataRow.DataPoints.get(0));
+            if(ID>highestID){
+                highestID=ID;
+            }
+        }
     }
     private void makeColumns(String firstLine){
         String colName = "";
@@ -72,19 +79,25 @@ public class Table {
         }
         for(int i=0;i<firstLine.length();i++){
             currentChar = firstLine.charAt(i);
-            if (currentChar != '\t') {
+            if (currentChar != '\t'&& currentChar!='\n') {
                 colName += currentChar;
             }
             else{
-                columnNames.add(colName);
-                TableAsString += colName + "\t";
-                colName = "";
+                if(!colName.isEmpty()) {
+                    columnNames.add(colName);
+                    TableAsString += colName + "\t";
+                    colName = "";
+                }
             }
+        }
+        if(!colName.isEmpty()) {
+            columnNames.add(colName);
+            TableAsString += colName + "\t";
         }
         TableAsString += "\n";
         numberOfColumns = columnNames.size();
     }
-    private void readData() throws IOException, GenericException {
+    private void readData(BufferedReader buffReader) throws IOException, GenericException {
         String nextLine;
         while(true){
             nextLine = buffReader.readLine();
@@ -96,13 +109,17 @@ public class Table {
     }
     private void AddRow(String Input) throws GenericException {
         DataRow newRow = new DataRow();
-        newRow.initialise(Input,numberOfColumns,numberOfRows,true);
+        newRow.initialise(Input,numberOfColumns,highestID++,true);
         TableAsString += newRow.getDataRowAsString();
         DataList.add(newRow);
         numberOfRows++;
         updateTableString();
         isEmpty = false;
         newRow.setTypeList((newRow.getTypeList()));
+    }
+    public void removeRow(DataRow toRemove){
+        DataList.remove(toRemove);
+        numberOfRows--;
     }
     public void addColumn(String title){
         columnNames.add(title);
@@ -131,9 +148,9 @@ public class Table {
     }
     public void insertValues(String values) throws GenericException {
         DataRow dataRow = new DataRow();
-        dataRow.initialise(values, numberOfColumns,numberOfRows++,false);
+        dataRow.initialise(values, numberOfColumns,highestID++,false);
         if(!isEmpty) {
-            dataRow.checkTypes(typesOfValues);
+            //dataRow.checkTypes(typesOfValues);
         }
         isEmpty = false;
         DataList.add(dataRow);
@@ -156,5 +173,39 @@ public class Table {
         }catch(Exception IOException){
             throw new GenericException("[ERROR] : Unable to write to disk");
         }
+    }
+    public void joinTable(Table joiningTable,int keyAttribute,int foreignKeyAttribute) throws GenericException {
+        columnNames.replaceAll(s -> TableName + "." + s);
+        columnNames.remove(keyAttribute);
+        if(keyAttribute==0) {
+            columnNames.add(0, "id");
+        }else{columnNames.set(0, "id");}
+        int newId=0;
+        boolean valueFound;
+         for(DataRow dataRow : DataList){
+             valueFound = false;
+             String foreignKey = dataRow.getSpecificValue(keyAttribute);
+             for(DataRow foreignRow : joiningTable.DataList){
+                 String foreignValue = foreignRow.getSpecificValue(foreignKeyAttribute);
+                 if(foreignKey.equals(foreignValue) && !valueFound){
+                     dataRow.combine(foreignRow,keyAttribute,foreignKeyAttribute,newId++);
+                     valueFound = true;
+                 }
+             }
+             if(!valueFound){
+                 DataList.remove(dataRow);
+             }
+         }
+        for(String title : joiningTable.columnNames){
+            int titleIndex = joiningTable.columnNames.indexOf(title);
+            if(titleIndex!=0 && titleIndex!=foreignKeyAttribute){
+                columnNames.add(joiningTable.TableName+"."+title);
+            }
+        }
+        updateTableString();
+    }
+    //TODO BELOW
+    private void reformatIDs(){
+
     }
 }

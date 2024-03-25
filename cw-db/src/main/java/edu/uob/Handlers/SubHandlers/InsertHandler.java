@@ -15,17 +15,17 @@ public class InsertHandler extends Handler {
     public String handleInsert() throws GenericException {
         CurrentToken=0;
         IncrementToken();
-        if(!ActiveToken.equalsIgnoreCase("INTO")){throw new GenericException( "[ERROR] : Expected token 'INTO'");}
+        compareToken(ActiveToken,"INTO");
         IncrementToken();
-        if((activeTable = isTable(activeTable))==null){throw new GenericException("[ERROR] : Invalid table") ;}
+        activeTable = isTable();
         IncrementToken();
-        if(!ActiveToken.equalsIgnoreCase("VALUES")){throw new GenericException( "[ERROR] : Expected token 'VALUES'");}
+        compareToken(ActiveToken,"VALUES");
         IncrementToken();
-        if(!ActiveToken.equals("(")){throw new GenericException( "[ERROR] : Expected token '('");}
+        compareToken(ActiveToken,"(");
         isValueList();
-        if(!ActiveToken.equals(")")){throw new GenericException( "[ERROR] : Expected token ')'");}
+        compareToken(ActiveToken,")");
         IncrementToken();
-        if(!ActiveToken.equals(";")){throw new GenericException( "[ERROR] : Expected token ';'");}
+        compareToken(ActiveToken,";");
         activeTable.insertValues(InsertValues);
         activeTable.writeToDisk();
         return "[OK] \nValues insert successfully \n"+activeTable.getTableAsString();

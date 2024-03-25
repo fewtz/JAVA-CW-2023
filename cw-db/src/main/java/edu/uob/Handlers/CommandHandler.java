@@ -45,6 +45,14 @@ public class CommandHandler {
                 UpdateHandler updateHandler = new UpdateHandler(tokens);
                 yield updateHandler.handleUpdate();
             }
+            case 8 -> {
+                DeleteHandler deleteHandler = new DeleteHandler(tokens);
+                yield deleteHandler.handleDelete();
+            }
+            case 9 -> {
+                JoinHandler joinHandler = new JoinHandler(tokens);
+                yield joinHandler.handleJoin();
+            }
             default -> "ERROR: Unknown command";
         };
     }
