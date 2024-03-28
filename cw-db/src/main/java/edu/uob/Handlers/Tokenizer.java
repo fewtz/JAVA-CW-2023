@@ -65,7 +65,7 @@ public class Tokenizer {
             isCurrOp=isOperator(currToken);
             if(isCurrOp&&isPrevOp){
                 tokens.remove(i+1);
-                tokens.set(i,prevToken+currToken);
+                tokens.set(i,currToken+prevToken);
             }
             prevToken = currToken;
             isPrevOp = isCurrOp;
@@ -73,7 +73,7 @@ public class Tokenizer {
     }
 
     private boolean isOperator(String token){
-        return token.equals("<")||token.equals(">")||token.equals("=");
+        return token.equals("<")||token.equals(">")||token.equals("=")||token.equals("!");
     }
     public void printTokens(){
         for(String token : tokens){

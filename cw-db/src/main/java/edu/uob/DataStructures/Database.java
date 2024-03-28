@@ -55,6 +55,7 @@ public class Database {
             Table newTable = new Table(file.getName(),file,this);
             tables.add(newTable);
             newTable.createTableFromFiles(buffReader,file);
+            buffReader.close();
         }
     }
 }

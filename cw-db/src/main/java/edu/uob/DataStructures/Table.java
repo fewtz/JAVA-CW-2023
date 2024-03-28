@@ -193,7 +193,10 @@ public class Table implements java.io.Serializable{
              String foreignKey = dataRow.getSpecificValue(keyAttribute);
              for(DataRow foreignRow : joiningTable.DataList){
                  String foreignValue = foreignRow.getSpecificValue(foreignKeyAttribute);
-                 if(foreignKey.equals(foreignValue) && !valueFound){
+                 if(valueFound){
+                    throw new GenericException("[ERROR] : Primary and foreign key has multiple matches in columns");
+                 }
+                 if(foreignKey.equals(foreignValue)){
                      dataRow.combine(foreignRow,keyAttribute,foreignKeyAttribute,newId++);
                      valueFound = true;
                  }

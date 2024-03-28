@@ -57,7 +57,7 @@ public class CreateHandler extends Handler {
     }
     private void createMaxIdFile(Database database) throws IOException, GenericException {
         File newFile = new File("databases/"+database.Name+"/MaxIds.txt");
-        if(!newFile.createNewFile()){throw new GenericException( "[ERROR] : Unable to create new table");}
+        if(!newFile.createNewFile()){throw new GenericException( "[ERROR] : Unable to create new id file");}
         database.setMaxIDFile(newFile);
     }
     private void makeTable() throws GenericException, IOException {
