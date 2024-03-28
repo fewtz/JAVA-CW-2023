@@ -23,11 +23,13 @@ public class Table implements java.io.Serializable{
     public File tableFile;
     public ArrayList<valueType> typesOfValues;
     public boolean isEmpty = true;
-    private int highestID=1;
+    private int highestID=-1;
+    private Database parentDatabase;
 
     //linked list....
-    public Table(String Name, File inputFile) throws IOException {
+    public Table(String Name, File inputFile,Database inpDatabase) throws IOException {
         TableName = Name;
+        parentDatabase = inpDatabase;
         tableFile = inputFile;
         numberOfColumns = 0;
         numberOfRows = 0;
@@ -68,7 +70,7 @@ public class Table implements java.io.Serializable{
         readHighestID();
     }
     private void readHighestID() throws GenericException {
-        highestID =  DBServer.activeDatabase.idList.getMaxID(TableName);
+        highestID =  parentDatabase.idList.getMaxID(TableName);
     }
     public int getMaxId(){
         return highestID;
@@ -113,7 +115,6 @@ public class Table implements java.io.Serializable{
     private void AddRow(String Input) throws GenericException {
         DataRow newRow = new DataRow();
         newRow.initialise(Input,numberOfColumns,++highestID,true);
-        DBServer.activeDatabase.idList.setMaxID(TableName,highestID);
         TableAsString += newRow.getDataRowAsString();
         DataList.add(newRow);
         numberOfRows++;
@@ -159,6 +160,7 @@ public class Table implements java.io.Serializable{
         isEmpty = false;
         DataList.add(dataRow);
         updateTableString();
+        parentDatabase.idList.setMaxID(TableName,highestID);
     }
     public String getSpecificColumnNames(ArrayList<Integer> indecies){
         String returnString = "";

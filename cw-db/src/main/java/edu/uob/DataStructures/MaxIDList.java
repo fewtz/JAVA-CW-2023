@@ -37,13 +37,12 @@ public class MaxIDList {
             char character = line.charAt(i);
             if(character == ' '){
                 Tables.add(builder.toString());
-            }
-            else if(character == '\n'){
-                MaxIDs.add(Integer.valueOf(builder.toString()));
-            }else{
+                builder = new StringBuilder();
+            } else{
                 builder.append(character);
             }
         }
+        MaxIDs.add(Integer.valueOf(builder.toString()));
     }
 
     public void setMaxID(String name, int MaxID) throws GenericException {
@@ -55,6 +54,7 @@ public class MaxIDList {
         }
         if(i<0){throw new GenericException("[ERROR] : No max ID record found");}
         MaxIDs.set(i,MaxID);
+        writeToDisk();
     }
     public int getMaxID(String name) throws GenericException {
         int i=-1;

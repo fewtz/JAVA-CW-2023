@@ -65,7 +65,7 @@ public class CreateHandler extends Handler {
         testNotKeyword();
         File newTableFile = new File("databases/"+DBServer.activeDatabase.Name+"/"+ newTableName+".tab");
         if(!newTableFile.createNewFile()){throw new GenericException( "[ERROR] : Unable to create new table");}
-        newTable = new Table(ActiveToken,newTableFile);
+        newTable = new Table(ActiveToken,newTableFile,DBServer.activeDatabase);
         DBServer.activeDatabase.tables.add(newTable);
         newTable.addColumn("id");
         newTable.updateTableString();

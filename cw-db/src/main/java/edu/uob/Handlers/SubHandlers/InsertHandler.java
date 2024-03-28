@@ -29,7 +29,6 @@ public class InsertHandler extends Handler {
         IncrementToken();
         compareToken(ActiveToken,";");
         activeTable.insertValues(InsertValues);
-        DBServer.activeDatabase.idList.setMaxID(activeTable.getName(),activeTable.getMaxId());
         activeTable.writeToDisk();
         return "[OK] \nValues insert successfully \n"+activeTable.getTableAsString();
     }
