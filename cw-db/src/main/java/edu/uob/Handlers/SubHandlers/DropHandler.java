@@ -14,6 +14,7 @@ public class DropHandler extends Handler {
         tokens = Input;
     }
     public String handleDrop() throws GenericException, IOException {
+        if(DBServer.activeDatabase == null){throw new GenericException("[ERROR] : Active database not set");}
         CurrentToken = 0;
         IncrementToken();
         return switch (checkDataType()) {

@@ -1,4 +1,5 @@
 package edu.uob.Handlers.SubHandlers;
+import edu.uob.DBServer;
 import edu.uob.DataStructures.DataRow;
 import edu.uob.DataStructures.Table;
 import edu.uob.Handlers.Conditions.Comparison;
@@ -17,6 +18,7 @@ public class JoinHandler extends ConditionHandler{
     }
 
     public String handleJoin() throws GenericException {
+        if(DBServer.activeDatabase == null){throw new GenericException("[ERROR] : Active database not set");}
         CurrentToken = 0;
         IncrementToken();
         activeTable = isTable();

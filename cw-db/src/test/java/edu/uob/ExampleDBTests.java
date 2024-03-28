@@ -140,6 +140,12 @@ public class ExampleDBTests {
         sendCommandToServer("INSERT INTO "+randomName+" VALUES (1,2,3)");
         response= sendCommandToServer("ALTER TABLE " + randomName + " DROP D;");
         assertTrue(response.contains("[OK]"), "An attempt was made to drop a non empty column, and it failed.");
+        response = sendCommandToServer("ALTER TABLE blahblahblah ADD D;");
+        assertFalse(response.contains("[OK]"), "An attempt was made to add a  column to a nonexistant table, and it didnt fail.");
+        response = sendCommandToServer("ALTER TABLE blahblahblah DROP D;");
+        assertFalse(response.contains("[OK]"), "An attempt was made to drop a nonexistant column from a nonexistant table, and it didnt fail.");
+        response = sendCommandToServer("ALTER TABLE blahblahblah DROP D;");
+        assertFalse(response.contains("[OK]"), "An attempt was made to drop a nonexistant column from a nonexistant table, and it didnt fail.");
     }
 
 }

@@ -1,5 +1,6 @@
 package edu.uob.Handlers.SubHandlers;
 
+import edu.uob.DBServer;
 import edu.uob.DataStructures.DataRow;
 import edu.uob.Handlers.Conditions.Comparison;
 import edu.uob.Handlers.Conditions.ConditionHandler;
@@ -12,6 +13,7 @@ public class DeleteHandler extends ConditionHandler{
     }
 
     public String handleDelete() throws GenericException {
+        if(DBServer.activeDatabase == null){throw new GenericException("[ERROR] : Active database not set");}
         CurrentToken = 0;
         IncrementToken();
         compareToken(ActiveToken,"FROM");

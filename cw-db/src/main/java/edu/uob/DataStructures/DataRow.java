@@ -1,16 +1,17 @@
 package edu.uob.DataStructures;
 
-
+import java.io.Serial;
 import edu.uob.Utilities.GenericException;
 import edu.uob.Utilities.StringUtils;
 import edu.uob.Utilities.valueType;
 
 import java.util.ArrayList;
 public class DataRow implements java.io.Serializable{
-
+    @Serial private static final long serialVersionUID = 3;
     public ArrayList<String> DataPoints;
     private String DataRowAsString;
     public ArrayList<valueType> datapointsTypes;
+    //ToDo make sure all datarows are valid on creation?
 
     DataRow(){
         DataPoints = new ArrayList<String>();

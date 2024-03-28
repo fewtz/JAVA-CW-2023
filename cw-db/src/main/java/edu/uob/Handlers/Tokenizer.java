@@ -1,12 +1,15 @@
 package edu.uob.Handlers;
 
+import edu.uob.Utilities.GenericException;
+
 import java.util.ArrayList;
 
 public class Tokenizer {
     ArrayList<String> tokens;
     String command;
-    public Tokenizer(String Input){
+    public Tokenizer(String Input) throws GenericException {
         command = Input;
+        if(command.isEmpty()){throw new GenericException("[ERROR] : Empty command supplied");}
     }
     public ArrayList<String> tokenize() throws IndexOutOfBoundsException{
         tokens = new ArrayList<String>();

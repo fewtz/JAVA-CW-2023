@@ -1,6 +1,7 @@
 package edu.uob.DataStructures;
 
 
+import edu.uob.DBServer;
 import edu.uob.Utilities.GenericException;
 import edu.uob.Utilities.valueType;
 
@@ -8,10 +9,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-
+import java.io.Serial;
 
 import java.io.*;
 public class Table implements java.io.Serializable{
+    @Serial private static final long serialVersionUID = 2;
     private int numberOfRows;
     private int numberOfColumns;
     public ArrayList<String> columnNames;
@@ -22,8 +24,9 @@ public class Table implements java.io.Serializable{
     public ArrayList<valueType> typesOfValues;
     public boolean isEmpty = true;
     private int highestID=1;
+
     //linked list....
-    public Table(String Name, File inputFile){
+    public Table(String Name, File inputFile) throws IOException {
         TableName = Name;
         tableFile = inputFile;
         numberOfColumns = 0;
@@ -59,18 +62,18 @@ public class Table implements java.io.Serializable{
     }
     public void createTableFromFiles(BufferedReader inpBuffReader,File inputFile) throws IOException, GenericException {
         makeColumns(inpBuffReader.readLine());
+        tableFile = inputFile;
         TableName = TableName.substring(0,TableName.length()-4);
         readData(inpBuffReader);
-        updateHighestID();
+        readHighestID();
     }
-    private void updateHighestID(){
-        for(DataRow dataRow : DataList){
-            int ID = Integer.parseInt(dataRow.DataPoints.get(0));
-            if(ID>highestID){
-                highestID=ID;
-            }
-        }
+    private void readHighestID() throws GenericException {
+        highestID =  DBServer.activeDatabase.idList.getMaxID(TableName);
     }
+    public int getMaxId(){
+        return highestID;
+    }
+
     private void makeColumns(String firstLine){
         String colName = "";
         char currentChar;
@@ -109,7 +112,8 @@ public class Table implements java.io.Serializable{
     }
     private void AddRow(String Input) throws GenericException {
         DataRow newRow = new DataRow();
-        newRow.initialise(Input,numberOfColumns,highestID++,true);
+        newRow.initialise(Input,numberOfColumns,++highestID,true);
+        DBServer.activeDatabase.idList.setMaxID(TableName,highestID);
         TableAsString += newRow.getDataRowAsString();
         DataList.add(newRow);
         numberOfRows++;
@@ -148,7 +152,7 @@ public class Table implements java.io.Serializable{
     }
     public void insertValues(String values) throws GenericException {
         DataRow dataRow = new DataRow();
-        dataRow.initialise(values, numberOfColumns,highestID++,false);
+        dataRow.initialise(values, numberOfColumns,++highestID,false);
         if(!isEmpty) {
             //dataRow.checkTypes(typesOfValues);
         }

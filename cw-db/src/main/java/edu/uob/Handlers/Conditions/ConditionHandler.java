@@ -154,7 +154,7 @@ public abstract class ConditionHandler extends Handler {
 
             for(int i=0;i<activeTable.columnNames.size();i++){
                 String title = activeTable.columnNames.get(i);
-                if(token.equals(title)){
+                if(token.equalsIgnoreCase(title)){
                     return newComparison.addAttribute(activeTable,i);
                 }
             }

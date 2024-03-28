@@ -32,7 +32,7 @@ public class CreateHandler extends Handler {
         return 0;
     }
         //TODO clean this up
-    private String createDatabase() throws GenericException {
+    private String createDatabase() throws GenericException, IOException {
         IncrementToken();
         newDatabaseName = ActiveToken;
         testNotKeyword();
@@ -43,16 +43,22 @@ public class CreateHandler extends Handler {
         if(! (newDatabaseFile.mkdirs())){throw new GenericException( "[ERROR] : Unable to make new database");}
         DBServer.databases.add(newDatabase);
         newDatabase.dataBaseFile = newDatabaseFile;
+        createMaxIdFile(newDatabase);
         return "[OK] \nCreated new database: "+newDatabaseName  ;
     }
     private String createTable() throws IOException, GenericException {
+        if(DBServer.activeDatabase == null){throw new GenericException("[ERROR] : Active database not set");}
         IncrementToken();
         makeTable();
         IncrementToken();
         if(ActiveToken.equals(";")){return "[OK] \nCreated new table: "+newTableName;}
-        newTable.addColumn("id");
         makeTableTitles();
         return "[OK] \nCreated new table: "+newTableName+"\n" + newTable.getTableAsString();
+    }
+    private void createMaxIdFile(Database database) throws IOException, GenericException {
+        File newFile = new File("databases/"+database.Name+"/MaxIds.txt");
+        if(!newFile.createNewFile()){throw new GenericException( "[ERROR] : Unable to create new table");}
+        database.setMaxIDFile(newFile);
     }
     private void makeTable() throws GenericException, IOException {
         newTableName = ActiveToken;
@@ -61,7 +67,10 @@ public class CreateHandler extends Handler {
         if(!newTableFile.createNewFile()){throw new GenericException( "[ERROR] : Unable to create new table");}
         newTable = new Table(ActiveToken,newTableFile);
         DBServer.activeDatabase.tables.add(newTable);
+        newTable.addColumn("id");
+        newTable.updateTableString();
         newTable.writeToDisk();
+        DBServer.activeDatabase.idList.createNewTableEntry(newTableName);
     }
     private void makeTableTitles() throws GenericException {
         IncrementToken();

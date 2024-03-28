@@ -20,9 +20,6 @@ public class DBServer {
     static public Database activeDatabase;
     public static void main(String args[]) throws IOException {
         DBServer server = new DBServer();
-        if(!databases.isEmpty()) {
-            activeDatabase = databases.get(0);
-        }
         server.blockingListenOn(8888);
     }
 
@@ -64,7 +61,7 @@ public class DBServer {
         }catch(GenericException e){
             return e.toString();
         }
-        catch(IOException e){
+        catch(IOException | IndexOutOfBoundsException e){
             return "[ERROR] : IOException";
         }
         return returnString;

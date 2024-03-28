@@ -1,5 +1,6 @@
 package edu.uob.Handlers.SubHandlers;
 
+import edu.uob.DBServer;
 import edu.uob.DataStructures.DataRow;
 import edu.uob.Handlers.Conditions.Comparison;
 import edu.uob.Handlers.Conditions.ConditionHandler;
@@ -14,6 +15,7 @@ public class UpdateHandler extends ConditionHandler {
     }
     private ArrayList<String> values = new ArrayList<>();
     public String handleUpdate() throws GenericException {
+        if(DBServer.activeDatabase == null){throw new GenericException("[ERROR] : Active database not set");}
         CurrentToken = 0;
         IncrementToken();
         activeTable = isTable();

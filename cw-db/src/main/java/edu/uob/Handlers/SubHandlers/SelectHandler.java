@@ -1,5 +1,6 @@
 package edu.uob.Handlers.SubHandlers;
 
+import edu.uob.DBServer;
 import edu.uob.DataStructures.DataRow;
 import edu.uob.Handlers.Conditions.ConditionHandler;
 import edu.uob.DataStructures.Table;
@@ -16,6 +17,7 @@ public class SelectHandler extends ConditionHandler {
         tokens = Input;
     }
     public String handleSelect() throws GenericException {
+        if(DBServer.activeDatabase == null){throw new GenericException("[ERROR] : Active database not set");}
         CurrentToken =0;
         checkAttributeList();
         compareToken(ActiveToken,"FROM");

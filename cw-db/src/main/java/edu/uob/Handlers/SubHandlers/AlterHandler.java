@@ -1,5 +1,6 @@
 package edu.uob.Handlers.SubHandlers;
 
+import edu.uob.DBServer;
 import edu.uob.Handlers.Conditions.ConditionHandler;
 import edu.uob.Handlers.Handler;
 import edu.uob.Utilities.GenericException;
@@ -12,6 +13,7 @@ public class AlterHandler extends Handler {
         tokens = Input;
     }
     public String handleAlter() throws GenericException {
+        if(DBServer.activeDatabase == null){throw new GenericException("[ERROR] : Active database not set");}
         CurrentToken=0;
         IncrementToken();
         compareToken(ActiveToken,"TABLE");
@@ -23,6 +25,8 @@ public class AlterHandler extends Handler {
         alterAttribute();
         IncrementToken();
         compareToken(ActiveToken,";");
+        activeTable.updateTableString();
+        activeTable.writeToDisk();
         return "[OK] \nTable Altered successfully \n" + activeTable.getTableAsString();
     }
     private int whatAlteration() throws GenericException {
@@ -34,6 +38,7 @@ public class AlterHandler extends Handler {
     }
     private void alterAttribute() throws GenericException {
         testNotKeyword();
+        if(ActiveToken.equals("id")){throw new GenericException("[ERROR] : Cannot add or remove id column");}
         switch (AlterationType) {
             case 1 -> {
                 for (String title : activeTable.columnNames) {

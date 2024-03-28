@@ -1,5 +1,6 @@
 package edu.uob.Handlers.SubHandlers;
 
+import edu.uob.DBServer;
 import edu.uob.Handlers.Handler;
 import edu.uob.Utilities.GenericException;
 
@@ -13,6 +14,7 @@ public class InsertHandler extends Handler {
         InsertValues = "";
     }
     public String handleInsert() throws GenericException {
+        if(DBServer.activeDatabase == null){throw new GenericException("[ERROR] : Active database not set");}
         CurrentToken=0;
         IncrementToken();
         compareToken(ActiveToken,"INTO");
@@ -27,6 +29,7 @@ public class InsertHandler extends Handler {
         IncrementToken();
         compareToken(ActiveToken,";");
         activeTable.insertValues(InsertValues);
+        DBServer.activeDatabase.idList.setMaxID(activeTable.getName(),activeTable.getMaxId());
         activeTable.writeToDisk();
         return "[OK] \nValues insert successfully \n"+activeTable.getTableAsString();
     }
