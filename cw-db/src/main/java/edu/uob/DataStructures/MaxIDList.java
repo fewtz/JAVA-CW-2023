@@ -26,10 +26,11 @@ public class MaxIDList {
         while(true){
             nextLine = buffReader.readLine();
             if(nextLine == null){
-                return;
+                break;
             }
             addEntry(nextLine);
         }
+        buffReader.close();
     }
     private void addEntry(String line){
         StringBuilder builder = new StringBuilder();
@@ -44,7 +45,6 @@ public class MaxIDList {
         }
         MaxIDs.add(Integer.valueOf(builder.toString()));
     }
-
     public void setMaxID(String name, int MaxID) throws GenericException {
         int i=-1;
         for(String title : Tables){

@@ -124,11 +124,13 @@ public class ExampleDBTests {
     @Test
     public void Alter(){
         String randomName = generateRandomName();
+        String response = sendCommandToServer("ALTER TABLE " + randomName + " ADD D;");
+        assertFalse(response.contains("[OK]"), "alter pre database choose did not fail");
         sendCommandToServer("CREATE DATABASE " + randomName + ";");
         sendCommandToServer("USE " + randomName + ";");
         randomName = generateRandomName();
         sendCommandToServer("CREATE TABLE " + randomName + " (A,B,C);");
-        String response = sendCommandToServer("ALTER TABLE " + randomName + " ADD D;");
+        response = sendCommandToServer("ALTER TABLE " + randomName + " ADD D;");
         assertTrue(response.contains("[OK]"), "An attempt was made to add a valid column but it failed.");
         response = sendCommandToServer("ALTER TABLE " + randomName + " ADD D;");
         assertFalse(response.contains("[OK]"), "An attempt was made to add a column that already existed, and it didnt fail.");
@@ -146,6 +148,44 @@ public class ExampleDBTests {
         assertFalse(response.contains("[OK]"), "An attempt was made to drop a nonexistant column from a nonexistant table, and it didnt fail.");
         response = sendCommandToServer("ALTER TABLE blahblahblah DROP D;");
         assertFalse(response.contains("[OK]"), "An attempt was made to drop a nonexistant column from a nonexistant table, and it didnt fail.");
+    }
+    @Test
+    public void Delete() {
+        String randomName = generateRandomName();
+        String response = sendCommandToServer("delete from " + randomName + " where id >= 0;");
+        assertFalse(response.contains("[OK]"), "delete attempt before database selection didnt fail");
+        randomName = generateRandomName();
+        sendCommandToServer("CREATE DATABASE " + randomName + ";");
+        sendCommandToServer("USE " + randomName + ";");
+        response = sendCommandToServer("DELETE from " + randomName + " where id >= 0;");
+        assertFalse(response.contains("[OK]"), "delete attempt before table creation didnt fail");
+        sendCommandToServer("CREATE TABLE " + randomName + " (one, two, three);");
+        response = sendCommandToServer("DELETE from " + randomName + " where id >= 0;");
+        assertTrue(response.contains("[OK]"), "delete attempt on empty table failed");
+        sendCommandToServer(" insert   into  " + randomName + "  values  (  1  , 2   , 3    );");
+        response = sendCommandToServer("DELETE from " + randomName + " where id >= 0;");
+        assertTrue(response.contains("[OK]"), "delete attempt on table failed");
+    }
+    @Test
+    public void Drop(){
+        String randomName = generateRandomName();
+        String response = sendCommandToServer("drop table "+randomName+";");
+        assertFalse(response.contains("[OK]"), "drop table before database selection didnt fail");
+        response = sendCommandToServer("drop database "+randomName+";");
+        assertFalse(response.contains("[OK]"), "drop database that doesnt exxist didnt fail");
+        sendCommandToServer("Create database "+randomName+";");
+        response = sendCommandToServer("drop database "+randomName+";");
+        assertTrue(response.contains("[OK]"), "drop database that does exxist didnt failed");
+        sendCommandToServer("Create database "+randomName+";");
+        sendCommandToServer("use "+randomName+" ;");
+        response = sendCommandToServer("drop table "+randomName+";");
+        assertFalse(response.contains("[OK]"), "drop  nonexistant table didnt fail");
+        sendCommandToServer("Create table "+randomName+";");
+        response = sendCommandToServer("drop table "+randomName+";");
+        assertTrue(response.contains("[OK]"), "dropping table failed");
+        sendCommandToServer("Create table "+randomName+";");
+        response = sendCommandToServer("drop database "+randomName+";");
+        assertTrue(response.contains("[OK]"), "coudlnt drop the database with tables inside it");
     }
 
 }

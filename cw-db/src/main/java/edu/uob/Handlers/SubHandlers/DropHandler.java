@@ -14,7 +14,7 @@ public class DropHandler extends Handler {
         tokens = Input;
     }
     public String handleDrop() throws GenericException, IOException {
-        if(DBServer.activeDatabase == null){throw new GenericException("[ERROR] : Active database not set");}
+
         CurrentToken = 0;
         IncrementToken();
         return switch (checkDataType()) {
@@ -47,10 +47,11 @@ public class DropHandler extends Handler {
         return "[OK] \n Database removed: "+ActiveToken;
     }
     private String dropTable() throws GenericException,IOException {
+        if(DBServer.activeDatabase == null){throw new GenericException("[ERROR] : Active database not set");}
         IncrementToken();
         Table tableToDelete=null;
         for(Table table : DBServer.activeDatabase.tables){
-            if((ActiveToken+".tab").equals(table.getName())){
+            if((ActiveToken).equals(table.getName())){
                 tableToDelete = table;
             }
         }
