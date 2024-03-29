@@ -3,7 +3,8 @@ import edu.uob.Utilities.GenericException;
 import java.io.*;
 import java.util.ArrayList;
 
-public class MaxIDList {
+public class MaxIDList implements java.io.Serializable{
+    @Serial private static final long serialVersionUID = 6;
     private File MaxIdFile;
     private ArrayList<String> Tables;
     private ArrayList<Integer> MaxIDs;

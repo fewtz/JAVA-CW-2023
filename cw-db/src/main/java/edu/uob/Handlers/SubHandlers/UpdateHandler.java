@@ -33,10 +33,11 @@ public class UpdateHandler extends ConditionHandler {
     private void checkNameValueList() throws GenericException {
         checkNamePair();
         IncrementToken();
-        if(ActiveToken.equals(",")){checkNamePair();}
+        if(ActiveToken.equals(",")){IncrementToken(); checkNameValueList();}
     }
     private void checkNamePair() throws GenericException {
         checkAttributeExists(ActiveToken,attributeIndexList,activeTable);
+        if(ActiveToken.equals("id")){throw new GenericException("[ERROR] : Cannot update the id column");}
         IncrementToken();
         compareToken(ActiveToken,"=");
         IncrementToken();

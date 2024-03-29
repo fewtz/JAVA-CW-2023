@@ -33,7 +33,6 @@ public abstract class ConditionHandler extends Handler {
             if(!checkConditionComponentType()){throw new GenericException("[ERROR] : Invalid condition tokens");}
             IncrementParsingToken();
         }
-        printConditionList();
         numberOfCompoents=conditionList.size();
         if(!parseCondition()){throw new GenericException("[ERROR] : Invalid condition logic");}
     }
@@ -84,7 +83,7 @@ public abstract class ConditionHandler extends Handler {
         newComboComparison.addSecondComparison(comparisonsList.get(1));
         comparisonsList.set(0,newComboComparison.evaluateCombo());
         comparisonsList.remove(1);
-        if(currentComponent<numberOfCompoents-1){if(parseComboCondition(currentComponent-1)>0){return parseComboCondition(currentComponent-1);};}
+        if(currentComponent<numberOfCompoents-1){if( (ReturnVal = parseComboCondition(currentComponent-1))>0){return ReturnVal;};}
         return currentComponent;
     }
     private String getTokenFromComponentIndex(int currentComponent){

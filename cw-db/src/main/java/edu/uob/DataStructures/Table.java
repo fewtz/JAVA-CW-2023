@@ -213,8 +213,4 @@ public class Table implements java.io.Serializable{
         }
         updateTableString();
     }
-    //TODO BELOW
-    private void reformatIDs(){
-
-    }
 }

@@ -292,7 +292,7 @@ public class ExampleDBTests {
         response = sendCommandToServer("select * from "+randomName+" where ((id == 0) OR (id!= 6));");
         assertTrue(response.contains("[OK]"), "regular wild select failed ");
         response = sendCommandToServer("select * from "+randomName+" where id <0 OR id<6 AND one !=2;");
-        assertTrue(response.contains("[OK]"), "regular wild select failed "); 
+        assertTrue(response.contains("[OK]"), "regular wild select failed ");
         response = sendCommandToServer("select * from "+randomName+" where (id >0 OR id<6) AND one !=2;");
         assertTrue(response.contains("[OK]"), "regular wild select failed ");
         response = sendCommandToServer("select * from "+randomName+" where id >0 OR (id<6 AND one !=2);");
@@ -300,8 +300,72 @@ public class ExampleDBTests {
         //For some reason superfluous brackets break it sometimes ! oh well!!
         response = sendCommandToServer("select * from "+randomName+" where (id >0 OR (id<6 AND one !=2));");
         assertTrue(response.contains("[OK]"), "regular wild select failed ");
-
+        response = sendCommandToServer("select * from "+randomName+" where (id >0 OR id == 1 AND (id<6 AND one !=2));");
+        assertTrue(response.contains("[OK]"), "regular wild select failed ");
+        response = sendCommandToServer("select * from "+randomName+" where (id >0 OR id == 1 AND (id<6 AND one !=2 AND two ==2));");
+        assertTrue(response.contains("[OK]"), "regular wild select failed ");
+        sendCommandToServer("create table 2 ( 1,2,3);");
+        response = sendCommandToServer("select * from 2 where (id >0);");
+        assertTrue(response.contains("[OK]"), "regular wild select failed ");
+        sendCommandToServer("insert into 2 values (1,2,3)");
+        sendCommandToServer("delete from 2 where id>-1");
+        response = sendCommandToServer("select * from 2 where (id >0);");
+        assertTrue(response.contains("[OK]"), "regular wild select failed ");
+        sendCommandToServer("create table 2;");
+        response = sendCommandToServer("select * from 2 where (id >0);");
+        assertTrue(response.contains("[OK]"), "regular wild select failed ");
     }
-
-
+    @Test
+    public void Update(){
+        String randomName = generateRandomName();
+        String response = sendCommandToServer("update "+randomName+" SEt slay= boots where id>=0;");
+        assertFalse(response.contains("[OK]"), "update before database selection didnt fail");
+        sendCommandToServer("create datABasE "+randomName+";");
+        sendCommandToServer("use "+randomName+";");
+        response = sendCommandToServer("update "+randomName+" SEt slay= boots where id>=0;");
+        assertFalse(response.contains("[OK]"), "update before table creation didnt fail");
+        sendCommandToServer("create table "+randomName+" (on1e,t2wo);");
+        response = sendCommandToServer("update "+randomName+" SEt on1e=1 where id>=0;");
+        assertTrue(response.contains("[OK]"), "valid update on empty table failed ");
+        sendCommandToServer("insert into "+randomName+" values (2,2);");
+        sendCommandToServer("insert into "+randomName+" values (2,2);");
+        sendCommandToServer("insert into "+randomName+" values (2,2);");
+        sendCommandToServer("insert into "+randomName+" values (2,2);");
+        sendCommandToServer("insert into "+randomName+" values (2,2);");
+        sendCommandToServer("insert into "+randomName+" values (2,2);");
+        response = sendCommandToServer("update "+randomName+" SEt on1e=1 where id>=0;");
+        assertTrue(response.contains("[OK]"), "valid update on table failed");
+        response = sendCommandToServer("update "+randomName+" SEt on1e=1, t2wo='three' where id>=0;");
+        assertTrue(response.contains("[OK]"), "valid update on table failed"+ response);
+    }
+    @Test
+    public void Join(){
+        String randomName = generateRandomName();
+        String table1 = generateRandomName();
+        String table2 = generateRandomName();
+        String response = sendCommandToServer("join "+table1+" AND "+table2+" on id AND id;");
+        assertFalse(response.contains("[OK]"), "join before database selection didnt fail");
+        response = sendCommandToServer("join "+table1+" AND "+table2+" on id AND id");
+        assertFalse(response.contains("[OK]"), "join without ; didnt fail");
+        sendCommandToServer("create database "+randomName+";");
+        sendCommandToServer("use "+randomName+";");
+        response = sendCommandToServer("join "+table1+" AND "+table2+" on id AND id;");
+        assertFalse(response.contains("[OK]"), "join without tables didnt fail");
+        sendCommandToServer("create table "+table1+" (one,two);");
+        sendCommandToServer("create table "+table2+" (one,two);");
+        response = sendCommandToServer("join "+table1+" AND "+table2+" on id AND id;");
+        assertTrue(response.contains("[OK]"), "join on valid empty tables failed "+response);
+        sendCommandToServer("insert into "+table1+" values (1,2)");
+        sendCommandToServer("insert into "+table1+" values (1,2)");
+        sendCommandToServer("insert into "+table1+" values (1,2)");
+        sendCommandToServer("insert into "+table1+" values (1,2)");
+        sendCommandToServer("insert into "+table1+" values (1,2)");
+        sendCommandToServer("insert into "+table2+" values (1,2)");
+        sendCommandToServer("insert into "+table2+" values (1,2)");
+        sendCommandToServer("insert into "+table2+" values (1,2)");
+        sendCommandToServer("insert into "+table2+" values (1,2)");
+        sendCommandToServer("insert into "+table2+" values (1,2)");
+        response = sendCommandToServer("join "+table1+" AND "+table2+" on id AND id;");
+        assertTrue(response.contains("[OK]"), "join on valid tables failed");
+    }
 }
