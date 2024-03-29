@@ -80,9 +80,11 @@ public abstract class ConditionHandler extends Handler {
         newComboComparison.addBooleanType(getTokenFromComponentIndex(currentComponent-1));
         if((currentComponent = IncrementConditionList(currentComponent))<0){return -1;}
         if((currentComponent=checkBracketAndExpression(currentComponent-1))<0){return -1;}
+        if(comparisonsList.size()<2){return -1;}
         newComboComparison.addSecondComparison(comparisonsList.get(1));
         comparisonsList.set(0,newComboComparison.evaluateCombo());
         comparisonsList.remove(1);
+        if(currentComponent<numberOfCompoents-1){if(parseComboCondition(currentComponent-1)>0){return parseComboCondition(currentComponent-1);};}
         return currentComponent;
     }
     private String getTokenFromComponentIndex(int currentComponent){

@@ -46,9 +46,12 @@ public class DataRow implements java.io.Serializable{
         DataPoints.add(datapoint);
     }
     public void removeValue(int i){
-        while(i<DataPoints.size()){
+        while(i<DataPoints.size()-1){
             DataPoints.set(i,DataPoints.get(i+1));
             i++;
+        }
+        if(i==DataPoints.size()-1){
+            DataPoints.remove(i);
         }
     }
     private void MakeRow(String Input,int positionInTable,boolean fromFile){

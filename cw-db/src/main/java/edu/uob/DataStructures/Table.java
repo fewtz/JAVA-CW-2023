@@ -135,7 +135,7 @@ public class Table implements java.io.Serializable{
         updateTableString();
     }
     public void removeColumn(String title){
-        for(int i=0;i<numberOfColumns;i++){
+        for(int i=0;i<columnNames.size();i++){
             String colName = columnNames.get(i);
             if(colName.equals(title)){
                 columnNames.remove(colName);

@@ -187,5 +187,121 @@ public class ExampleDBTests {
         response = sendCommandToServer("drop database "+randomName+";");
         assertTrue(response.contains("[OK]"), "coudlnt drop the database with tables inside it");
     }
+    @Test
+    public void Insert(){
+        String randomName = generateRandomName();
+        String response = sendCommandToServer("insert into "+randomName+" values ( 1 ,2);");
+        assertFalse(response.contains("[OK]"), "insert before database selection didnt fail");
+        sendCommandToServer("Create database "+randomName+";");
+        sendCommandToServer("use "+randomName+" ;");
+        response = sendCommandToServer("insert into "+randomName+" values ( 1 ,2);");
+        assertFalse(response.contains("[OK]"), "insert before table made didnt fail");
+        sendCommandToServer("Create table "+randomName+" ( one,two);");
+        response = sendCommandToServer("insert into "+randomName+" values ( 1 ,2);");
+        assertTrue(response.contains("[OK]"), "regular insert failed");
+        response = sendCommandToServer("insert into "+randomName+" values ( 1);");
+        assertFalse(response.contains("[OK]"), "insert with too few values didnt fail;");
+        response = sendCommandToServer("insert into "+randomName+" values (1,2,3) ;");
+        assertFalse(response.contains("[OK]"), "insert with too many values didnt fail;");
+        sendCommandToServer("alter table "+randomName+" add three;");
+        response = sendCommandToServer("insert into "+randomName+" values (1,2);");
+        assertFalse(response.contains("[OK]"), "insert with too few values didnt fail after alter");
+        sendCommandToServer("alter table "+randomName+" drop three;");
+        sendCommandToServer("alter table "+randomName+" drop two;");
+        sendCommandToServer("alter table "+randomName+" drop one;");
+        response = sendCommandToServer("insert into "+randomName+" values ();");
+        assertFalse(response.contains("[OK]"), "insert into empty table did not fail");
+        sendCommandToServer("alter table "+randomName+" add three;");
+        response = sendCommandToServer("insert into "+randomName+" values (3);");
+        assertTrue(response.contains("[OK]"), "insert into altered table failed");
+    }
+    @Test
+    public void Select(){
+        String randomName = generateRandomName();
+        String response = sendCommandToServer("select * from "+randomName+";");
+        assertFalse(response.contains("[OK]"), "select before database selection didnt fail");
+        response = sendCommandToServer("select 1,2 from "+randomName+";");
+        assertFalse(response.contains("[OK]"), "select before database selection didnt fail");
+        sendCommandToServer("Create database "+randomName+";");
+        sendCommandToServer("use "+randomName+" ;");
+        sendCommandToServer("Create table "+randomName+" ( one,two);");
+        response = sendCommandToServer("select * from "+randomName+";");
+        assertTrue(response.contains("[OK]"), "regular wild select failed on empty ");
+        sendCommandToServer("insert into "+randomName+" values (1,2);");
+        sendCommandToServer("insert into "+randomName+" values (1,2);");
+        sendCommandToServer("insert into "+randomName+" values (1,2);");
+        sendCommandToServer("insert into "+randomName+" values (1,2);");
+        sendCommandToServer("insert into "+randomName+" values (1,2);");
+        sendCommandToServer("insert into "+randomName+" values (1,2);");
+        sendCommandToServer("insert into "+randomName+" values (1,2);");
+        sendCommandToServer("insert into "+randomName+" values (1,2);");
+        sendCommandToServer("insert into "+randomName+" values (1,2);");
+        sendCommandToServer("insert into "+randomName+" values (1,2);");
+        sendCommandToServer("insert into "+randomName+" values (1,2);");
+        sendCommandToServer("insert into "+randomName+" values (1,2);");
+        sendCommandToServer("insert into "+randomName+" values (1,2);");
+        sendCommandToServer("insert into "+randomName+" values (1,2);");
+        sendCommandToServer("insert into "+randomName+" values (1,2);");
+        sendCommandToServer("insert into "+randomName+" values (1,2);");
+        sendCommandToServer("insert into "+randomName+" values (1,2);");
+        sendCommandToServer("insert into "+randomName+" values (1,2);");
+        sendCommandToServer("insert into "+randomName+" values (1,2);");
+        sendCommandToServer("insert into "+randomName+" values (1,2);");
+        sendCommandToServer("insert into "+randomName+" values (1,2);");
+        sendCommandToServer("insert into "+randomName+" values (1,2);");
+        sendCommandToServer("insert into "+randomName+" values (1,2);");
+        response = sendCommandToServer("select * from "+randomName+";");
+        assertTrue(response.contains("[OK]"), "regular wild select failed ");
+        response = sendCommandToServer("select id,one,two from "+randomName+";");
+        assertTrue(response.contains("[OK]"), "regular wild select failed ");
+        response = sendCommandToServer("select id,two from "+randomName+";");
+        assertTrue(response.contains("[OK]"), "regular wild select failed ");
+        response = sendCommandToServer("select id,id from "+randomName+";");
+        assertTrue(response.contains("[OK]"), "regular wild select failed ");
+        response = sendCommandToServer("select id,two,id from "+randomName+";");
+        assertTrue(response.contains("[OK]"), "regular wild select failed ");
+        response = sendCommandToServer("select id,two,id,one from "+randomName+";");
+        assertTrue(response.contains("[OK]"), "regular wild select failed ");
+
+        //This is really condition testing now lets gooo
+
+        response = sendCommandToServer("select * from "+randomName+" where id > 0;");
+        assertTrue(response.contains("[OK]"), "regular wild select failed ");
+        response = sendCommandToServer("select * from "+randomName+" where id > 0 AND id< 6;");
+        assertTrue(response.contains("[OK]"), "regular wild select failed ");
+        response = sendCommandToServer("select * from "+randomName+" where (id > 0) AND (id< 6);");
+        assertTrue(response.contains("[OK]"), "regular wild select failed ");
+        response = sendCommandToServer("select * from "+randomName+" where ((id > 0) AND (id< 6));");
+        assertTrue(response.contains("[OK]"), "regular wild select failed ");
+        response = sendCommandToServer("select * from "+randomName+" where id > 0 OR id< 6;");
+        assertTrue(response.contains("[OK]"), "regular wild select failed ");
+        response = sendCommandToServer("select * from "+randomName+" where (id > 0) OR (id< 6);");
+        assertTrue(response.contains("[OK]"), "regular wild select failed ");
+        response = sendCommandToServer("select * from "+randomName+" where ((id > 0) OR (id< 6));");
+        assertTrue(response.contains("[OK]"), "regular wild select failed ");
+        response = sendCommandToServer("select * from "+randomName+" where id == 0 AND id <= 6;");
+        assertTrue(response.contains("[OK]"), "regular wild select failed ");
+        response = sendCommandToServer("select * from "+randomName+" where (id >= 0) AND (id!= 6);");
+        assertTrue(response.contains("[OK]"), "regular wild select failed ");
+        response = sendCommandToServer("select * from "+randomName+" where ( (id > 0) AND ( id< 6));");
+        assertTrue(response.contains("[OK]"), "regular wild select failed ");
+        response = sendCommandToServer("select * from "+randomName+" where id <0 OR id<6;");
+        assertTrue(response.contains("[OK]"), "regular wild select failed ");
+        response = sendCommandToServer("select * from "+randomName+" where (id > 0) OR (id< 6);");
+        assertTrue(response.contains("[OK]"), "regular wild select failed ");
+        response = sendCommandToServer("select * from "+randomName+" where ((id == 0) OR (id!= 6));");
+        assertTrue(response.contains("[OK]"), "regular wild select failed ");
+        response = sendCommandToServer("select * from "+randomName+" where id <0 OR id<6 AND one !=2;");
+        assertTrue(response.contains("[OK]"), "regular wild select failed "); 
+        response = sendCommandToServer("select * from "+randomName+" where (id >0 OR id<6) AND one !=2;");
+        assertTrue(response.contains("[OK]"), "regular wild select failed ");
+        response = sendCommandToServer("select * from "+randomName+" where id >0 OR (id<6 AND one !=2);");
+        assertTrue(response.contains("[OK]"), "regular wild select failed ");
+        //For some reason superfluous brackets break it sometimes ! oh well!!
+        response = sendCommandToServer("select * from "+randomName+" where (id >0 OR (id<6 AND one !=2));");
+        assertTrue(response.contains("[OK]"), "regular wild select failed ");
+
+    }
+
 
 }

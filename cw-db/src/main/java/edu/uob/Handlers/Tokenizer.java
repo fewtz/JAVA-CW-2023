@@ -11,7 +11,7 @@ public class Tokenizer {
         command = Input;
         if(command.isEmpty()){throw new GenericException("[ERROR] : Empty command supplied");}
     }
-    public ArrayList<String> tokenize() throws IndexOutOfBoundsException{
+    public ArrayList<String> tokenize() throws IndexOutOfBoundsException, GenericException {
         tokens = new ArrayList<String>();
         String tempToken="";
         char currentChar;
@@ -37,7 +37,7 @@ public class Tokenizer {
             previousState = currentState;
         }
         combineOperators();
-        printTokens();
+        if(!tokens.get(tokens.size()-1).equals(";")){throw new GenericException("[ERROR] : Missing closing ';'");}
         return tokens;
     }
     private void flush(String tempToken){
@@ -48,7 +48,7 @@ public class Tokenizer {
     private int isFlushToken(char current){
         if(current == ' ' || current == ')' ) {
             return 1;
-        } else if ( current == '=' || current == '>' || current == '<' || current == '(' || current == ','){
+        } else if ( current == '=' || current == '>' || current == '<' || current == '(' || current == ','|| current == '!'){
             return 2;
         }else if( current == ';'){
             return 3;
