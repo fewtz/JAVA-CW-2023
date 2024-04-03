@@ -3,7 +3,8 @@ import edu.uob.Utilities.GenericException;
 import java.io.*;
 import java.util.ArrayList;
 
-public class MaxIDList {
+public class MaxIDList implements java.io.Serializable{
+    @Serial private static final long serialVersionUID = 6;
     private File MaxIdFile;
     private ArrayList<String> Tables;
     private ArrayList<Integer> MaxIDs;
@@ -13,7 +14,6 @@ public class MaxIDList {
         MaxIDs = new ArrayList<>();
         initArrays();
     }
-
     private void initArrays() throws GenericException, IOException {
         BufferedReader buffReader;
         try {
@@ -22,13 +22,10 @@ public class MaxIDList {
         } catch (FileNotFoundException e) {
             throw new GenericException("[ERROR] : File not found");
         }
-        String nextLine;
-        while(true){
-            nextLine = buffReader.readLine();
-            if(nextLine == null){
-                break;
-            }
+        String nextLine = buffReader.readLine();
+        while(nextLine!=null){
             addEntry(nextLine);
+            nextLine = buffReader.readLine();
         }
         buffReader.close();
     }
@@ -71,7 +68,6 @@ public class MaxIDList {
         MaxIDs.add(0);
         writeToDisk();
     }
-
     public void writeToDisk() throws GenericException {
         StringBuilder builder = new StringBuilder();
         for(int i=0;i<Tables.size();i++){

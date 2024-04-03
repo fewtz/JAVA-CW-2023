@@ -26,12 +26,10 @@ public class CreateHandler extends Handler {
         };
     }
     private int checkDataType(){
-        System.out.println(ActiveToken);
         if(ActiveToken.equalsIgnoreCase("DATABASE")){return 1;}
         if(ActiveToken.equalsIgnoreCase("TABLE")){return 2;}
         return 0;
     }
-        //TODO clean this up
     private String createDatabase() throws GenericException, IOException {
         IncrementToken();
         newDatabaseName = ActiveToken;

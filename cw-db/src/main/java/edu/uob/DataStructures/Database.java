@@ -5,7 +5,8 @@ import edu.uob.Utilities.GenericException;
 import java.io.*;
 import java.util.ArrayList;
 
-public class Database {
+public class Database implements java.io.Serializable {
+    @Serial private static final long serialVersionUID = 5;
     public ArrayList<Table> tables;
     public String Name;
     public File dataBaseFile;

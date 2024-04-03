@@ -1,7 +1,6 @@
 package edu.uob.Handlers;
 
 import edu.uob.Utilities.GenericException;
-
 import java.util.ArrayList;
 
 public class Tokenizer {
@@ -11,33 +10,27 @@ public class Tokenizer {
         command = Input;
         if(command.isEmpty()){throw new GenericException("[ERROR] : Empty command supplied");}
     }
-    public ArrayList<String> tokenize() throws IndexOutOfBoundsException{
-        tokens = new ArrayList<String>();
+    public ArrayList<String> tokenize() throws IndexOutOfBoundsException, GenericException {
+        tokens = new ArrayList<>();
         String tempToken="";
         char currentChar;
-        int currentCharPlace=0;
+        int currentCharPlace=-1;
         int currentState=0;
         int previousState=0;
         int commandLength = command.length();
-        //  YOU HAVE TO FIX THIS LATER THIS IS DISGUSTING
-        while(true){
+        while(++currentCharPlace<commandLength){
             currentChar=command.charAt(currentCharPlace);
-            if(currentState!=3){currentState= isFlushToken(currentChar);}
-            if(currentState>0||previousState==2){
+            currentState= isFlushToken(currentChar);
+            if(currentState!=0||previousState==2){
                 flush(tempToken);
                 tempToken="";
             }
             if(currentChar!=' '){tempToken+=currentChar;}
-            if(currentCharPlace++>=commandLength-1){
-                flush(tempToken);
-                if((currentState==3&&tempToken.isEmpty())||tempToken.equals(";")){break;}
-                System.out.println("Bad Command, please try again");
-                break;
-            }
+            if(currentCharPlace==commandLength-1){flush(tempToken);}
             previousState = currentState;
         }
         combineOperators();
-        printTokens();
+        if(!tokens.get(tokens.size()-1).equals(";")){throw new GenericException("[ERROR] : Missing closing ';'");}
         return tokens;
     }
     private void flush(String tempToken){
@@ -48,7 +41,7 @@ public class Tokenizer {
     private int isFlushToken(char current){
         if(current == ' ' || current == ')' ) {
             return 1;
-        } else if ( current == '=' || current == '>' || current == '<' || current == '(' || current == ','){
+        } else if ( current == '=' || current == '>' || current == '<' || current == '(' || current == ','|| current == '!'){
             return 2;
         }else if( current == ';'){
             return 3;
@@ -71,13 +64,7 @@ public class Tokenizer {
             isPrevOp = isCurrOp;
         }
     }
-
     private boolean isOperator(String token){
         return token.equals("<")||token.equals(">")||token.equals("=")||token.equals("!");
-    }
-    public void printTokens(){
-        for(String token : tokens){
-            System.out.println(token);
-        }
     }
 }
