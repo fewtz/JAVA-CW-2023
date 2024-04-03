@@ -15,10 +15,10 @@ public class Database implements java.io.Serializable {
 
     public Database(String inputName){
         Name = inputName;
-        tables = new ArrayList<Table>();
+        tables = new ArrayList<>();
     }
     public void createDatabaseFromFiles(File DatabaseDirectory) throws IOException, GenericException {
-        tables = new ArrayList<Table>();
+        tables = new ArrayList<>();
         dataBaseFile = DatabaseDirectory;
         File[] FilesList = DatabaseDirectory.listFiles();
         if(FilesList!=null) {

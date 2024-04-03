@@ -15,7 +15,6 @@ edu/uob/Handlers/Conditions/Comparison$1.class
 edu/uob/Utilities/GenericException.class
 edu/uob/Handlers/Handler.class
 edu/uob/DBClient.class
-edu/uob/Handlers/Conditions/ConditionHandler$1.class
 edu/uob/DataStructures/Table.class
 edu/uob/Utilities/DeepObjectCopier.class
 edu/uob/Handlers/SubHandlers/AlterHandler.class
@@ -25,6 +24,6 @@ edu/uob/DBServer.class
 edu/uob/Handlers/Conditions/ConditionHandler$ConditionComponent.class
 edu/uob/DataStructures/DataRow.class
 edu/uob/Handlers/SubHandlers/InsertHandler.class
-edu/uob/Handlers/Handler$Modes.class
 edu/uob/Handlers/Conditions/Comparison.class
+edu/uob/DataStructures/MaxIDList.class
 edu/uob/Handlers/Conditions/ComboComparison$boolType.class

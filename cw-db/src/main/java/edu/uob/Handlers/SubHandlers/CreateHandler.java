@@ -36,7 +36,7 @@ public class CreateHandler extends Handler {
         testNotKeyword();
         IncrementToken();
         compareToken(ActiveToken,";");
-        File newDatabaseFile = new File("databases/"+newDatabaseName);
+        File newDatabaseFile = new File("databases"+File.separator+newDatabaseName);
         Database newDatabase = new Database(newDatabaseName);
         if(! (newDatabaseFile.mkdirs())){throw new GenericException( "[ERROR] : Unable to make new database");}
         DBServer.databases.add(newDatabase);
@@ -54,14 +54,14 @@ public class CreateHandler extends Handler {
         return "[OK] \nCreated new table: "+newTableName+"\n" + newTable.getTableAsString();
     }
     private void createMaxIdFile(Database database) throws IOException, GenericException {
-        File newFile = new File("databases/"+database.Name+"/MaxIds.txt");
+        File newFile = new File("databases"+File.separator+database.Name+File.separator+"MaxIds.txt");
         if(!newFile.createNewFile()){throw new GenericException( "[ERROR] : Unable to create new id file");}
         database.setMaxIDFile(newFile);
     }
     private void makeTable() throws GenericException, IOException {
         newTableName = ActiveToken;
         testNotKeyword();
-        File newTableFile = new File("databases/"+DBServer.activeDatabase.Name+"/"+ newTableName+".tab");
+        File newTableFile = new File("databases"+File.separator+DBServer.activeDatabase.Name+File.separator+ newTableName+".tab");
         if(!newTableFile.createNewFile()){throw new GenericException( "[ERROR] : Unable to create new table");}
         newTable = new Table(ActiveToken,newTableFile,DBServer.activeDatabase);
         DBServer.activeDatabase.tables.add(newTable);
