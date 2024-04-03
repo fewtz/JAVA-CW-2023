@@ -11,10 +11,9 @@ public class DataRow implements java.io.Serializable{
     public ArrayList<String> DataPoints;
     private String DataRowAsString;
     public ArrayList<valueType> datapointsTypes;
-    //ToDo make sure all datarows are valid on creation?
 
     DataRow(){
-        DataPoints = new ArrayList<String>();
+        DataPoints = new ArrayList<>();
         DataRowAsString = "";
     }
     public void initialise(String Input,int DesiredSize,int positionInTable,boolean fromFile) throws GenericException {
@@ -32,16 +31,6 @@ public class DataRow implements java.io.Serializable{
         }
         return datapointsTypes;
     }
-    public void checkTypes(ArrayList<valueType> inputList) throws GenericException {
-        valueType type;
-        String value;
-        for(int i=0;i<DataPoints.size();i++){
-            value = DataPoints.get(i);
-            type = inputList.get(i);
-            if(!type.equals(StringUtils.checkType(value))){}//throw new GenericException("[ERROR] : Incorrect type insertion");}
-        }
-        datapointsTypes = inputList;
-    }
     public void addValue(String datapoint){
         DataPoints.add(datapoint);
     }
@@ -55,7 +44,7 @@ public class DataRow implements java.io.Serializable{
         }
     }
     private void MakeRow(String Input,int positionInTable,boolean fromFile){
-        datapointsTypes = new ArrayList<valueType>();
+        datapointsTypes = new ArrayList<>();
         String datapoint = "";
         if(!fromFile) {
             DataPoints.add(Integer.toString(positionInTable));
@@ -145,7 +134,6 @@ public class DataRow implements java.io.Serializable{
                 addValue(value);
             }
         }
-
         updateRowString();
     }
 

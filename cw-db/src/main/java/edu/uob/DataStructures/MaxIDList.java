@@ -14,7 +14,6 @@ public class MaxIDList implements java.io.Serializable{
         MaxIDs = new ArrayList<>();
         initArrays();
     }
-
     private void initArrays() throws GenericException, IOException {
         BufferedReader buffReader;
         try {
@@ -23,13 +22,10 @@ public class MaxIDList implements java.io.Serializable{
         } catch (FileNotFoundException e) {
             throw new GenericException("[ERROR] : File not found");
         }
-        String nextLine;
-        while(true){
-            nextLine = buffReader.readLine();
-            if(nextLine == null){
-                break;
-            }
+        String nextLine = buffReader.readLine();
+        while(nextLine!=null){
             addEntry(nextLine);
+            nextLine = buffReader.readLine();
         }
         buffReader.close();
     }
@@ -72,7 +68,6 @@ public class MaxIDList implements java.io.Serializable{
         MaxIDs.add(0);
         writeToDisk();
     }
-
     public void writeToDisk() throws GenericException {
         StringBuilder builder = new StringBuilder();
         for(int i=0;i<Tables.size();i++){

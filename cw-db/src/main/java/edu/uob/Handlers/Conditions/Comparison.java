@@ -16,10 +16,8 @@ public class Comparison {
         EQUALTO,
         NOTEQUALTO,
         LIKE,
-    };
+    }
     comparison comparisonType;
-    String valueToken;
-    String attribute;
     valueType typeOfValue;
     int ValueInt=0;
     boolean ValueBoolean=false;
@@ -30,9 +28,8 @@ public class Comparison {
     public ArrayList<String> validIDList;
     public Comparison(){}
     public boolean evaluate(){
-        validIDList = new ArrayList<String>();
+        validIDList = new ArrayList<>();
         for(DataRow dataRow : activeTable.DataList){
-            //if(typeOfValue!=dataRow.datapointsTypes.get(attributeIndex)){return true;}
             switch(typeOfValue){
                 case INTEGER -> testInteger(dataRow);
                 case BOOLEAN -> testBoolean(dataRow);

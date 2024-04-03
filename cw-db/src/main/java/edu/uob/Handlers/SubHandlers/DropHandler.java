@@ -38,7 +38,6 @@ public class DropHandler extends Handler {
         File[] allContents = databaseToDeleteFile.listFiles();
         if (allContents != null) {
             for (File file : allContents) {
-                System.out.println(file.getName());
                 if(!file.delete()){throw new GenericException("[ERROR] : File inside database could not be deleted");}
             }
         }

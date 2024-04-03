@@ -7,14 +7,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class CommandHandler {
-    private ArrayList<String> tokens;
     public CommandHandler(){
     }
-
     public String handleNewCommand(String command) throws IOException, GenericException {
         Tokenizer tokenizer = new Tokenizer(command);
-        tokens = tokenizer.tokenize();
-        if(tokens.isEmpty()){return "ERROR: Failed to Tokenize";}
+        ArrayList<String> tokens = tokenizer.tokenize();
         int commandType = getCommandType(tokens.get(0));
         return switch (commandType) {
             case 1 -> {

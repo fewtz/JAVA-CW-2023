@@ -3,19 +3,9 @@ package edu.uob.Handlers;
 import edu.uob.DBServer;
 import edu.uob.Utilities.GenericException;
 import edu.uob.DataStructures.Table;
-
-import java.net.Inet4Address;
 import java.util.ArrayList;
 
 public abstract class Handler {
-    enum Modes{
-        PLUSNUM,
-        MINUSNUM,
-        SETNUM,
-        TRUE,
-        FALSE,
-        STRING;
-    }
     public ArrayList<String> tokens;
     public int CurrentToken;
     public String ActiveToken;
@@ -35,8 +25,6 @@ public abstract class Handler {
             throw new GenericException("[ERROR] : Cannot use keyword as table,database or attribute title");
         }
     }
-
-    //need to catch overflows here !!1
     public void IncrementToken() throws GenericException {
         try {
             ActiveToken = tokens.get(++CurrentToken);
@@ -134,7 +122,6 @@ public abstract class Handler {
             throw new GenericException("[ERROR] : That attribute is not in scope");
         }
     }
-
     public void compareToken(String token, String target) throws GenericException {
         if(!token.equalsIgnoreCase(target)){throw new GenericException("[ERROR] : Expected token :"+target);}
     }

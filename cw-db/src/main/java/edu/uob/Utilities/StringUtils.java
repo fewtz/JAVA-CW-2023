@@ -44,16 +44,6 @@ public abstract class StringUtils {
         else if (firstValue=='-') {return false;}
         else return !Character.isDigit(firstValue);
     }
-    public static boolean isStringLiteral(String value){
-        if(value.charAt(0)!='\''){return false;}
-        String bufferValue="";
-        for(int i=1;i<value.length()-1;i++) {
-            char character = value.charAt(i);
-            if(character==34||character==39||character==124){return false;}
-        }
-        return value.charAt(0)!='\'';
-    }
-
     public static valueType checkType(String value){
         if(isIntegerLiteral(value)){
             return valueType.INTEGER;

@@ -12,7 +12,7 @@ public abstract class ConditionHandler extends Handler {
         EXPRESSION,
         OPENBRACKET,
         CLOSEBRACKET,
-    };
+    }
     String parsingToken;
     int ReturnVal;
     ArrayList<ConditionComponent> conditionList;
@@ -25,26 +25,16 @@ public abstract class ConditionHandler extends Handler {
     public ArrayList<DataRow> validRows;
 
     public void parseConditions() throws GenericException {
-        conditionList = new ArrayList<ConditionComponent>();
+        conditionList = new ArrayList<>();
         parsingToken = ActiveToken;
         currentParsingToken=CurrentToken+1;
-        comparisonsList = new ArrayList<Comparison>();
+        comparisonsList = new ArrayList<>();
         while(!parsingToken.equals(";")&&currentParsingToken<tokens.size()){
             if(!checkConditionComponentType()){throw new GenericException("[ERROR] : Invalid condition tokens");}
             IncrementParsingToken();
         }
         numberOfCompoents=conditionList.size();
         if(!parseCondition()){throw new GenericException("[ERROR] : Invalid condition logic");}
-    }
-    private void printConditionList(){
-        for(ConditionComponent component : conditionList){
-            switch(component){
-                case BOOLEANOPERATOR -> System.out.println("BOOLEAN");
-                case CLOSEBRACKET-> System.out.println("CLOSEBRACKET");
-                case OPENBRACKET -> System.out.println("OPENBRACKET");
-                case EXPRESSION -> System.out.println("EXPRESSION");
-            }
-        }
     }
     private boolean parseCondition(){
         int testing,testing2,testing3;
@@ -83,7 +73,7 @@ public abstract class ConditionHandler extends Handler {
         newComboComparison.addSecondComparison(comparisonsList.get(1));
         comparisonsList.set(0,newComboComparison.evaluateCombo());
         comparisonsList.remove(1);
-        if(currentComponent<numberOfCompoents-1){if( (ReturnVal = parseComboCondition(currentComponent-1))>0){return ReturnVal;};}
+        if(currentComponent<numberOfCompoents-1){if( (ReturnVal = parseComboCondition(currentComponent-1))>0){return ReturnVal;}}
         return currentComponent;
     }
     private String getTokenFromComponentIndex(int currentComponent){
@@ -92,8 +82,6 @@ public abstract class ConditionHandler extends Handler {
         for(int j=0;j<conditionList.size();j++){
             currentCondition = conditionList.get(j);
             if(j==currentComponent){
-                System.out.println(currentCondition);
-                System.out.println(tokens.get(i));
                 return tokens.get(i);
             }
             if(currentCondition==ConditionComponent.EXPRESSION){
@@ -182,7 +170,7 @@ public abstract class ConditionHandler extends Handler {
     public void checkValidConditions(Table table) throws GenericException {
         activeTable = table;
         parseConditions();
-        validRows = new ArrayList<DataRow>();
+        validRows = new ArrayList<>();
         for(DataRow dataRow : table.DataList){
             for(String validID : comparisonsList.get(0).validIDList){
                 if(dataRow.DataPoints.get(0).equals(validID)){

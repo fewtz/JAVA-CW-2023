@@ -1,27 +1,20 @@
 package edu.uob.DataStructures;
 
-
-import edu.uob.DBServer;
 import edu.uob.Utilities.GenericException;
-import edu.uob.Utilities.valueType;
-
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.io.Serial;
 
 import java.io.*;
 public class Table implements java.io.Serializable{
     @Serial private static final long serialVersionUID = 2;
-    private int numberOfRows;
     private int numberOfColumns;
     public ArrayList<String> columnNames;
     public ArrayList<DataRow> DataList;
     private String TableName;
     private String TableAsString;
     public File tableFile;
-    public ArrayList<valueType> typesOfValues;
     public boolean isEmpty = true;
     private int highestID=-1;
     private Database parentDatabase;
@@ -32,7 +25,6 @@ public class Table implements java.io.Serializable{
         parentDatabase = inpDatabase;
         tableFile = inputFile;
         numberOfColumns = 0;
-        numberOfRows = 0;
         DataList = new ArrayList<>();
         columnNames = new ArrayList<>();
         TableAsString = "";
@@ -72,10 +64,6 @@ public class Table implements java.io.Serializable{
     private void readHighestID() throws GenericException {
         highestID =  parentDatabase.idList.getMaxID(TableName);
     }
-    public int getMaxId(){
-        return highestID;
-    }
-
     private void makeColumns(String firstLine){
         String colName = "";
         char currentChar;
@@ -117,14 +105,12 @@ public class Table implements java.io.Serializable{
         newRow.initialise(Input,numberOfColumns,++highestID,true);
         TableAsString += newRow.getDataRowAsString();
         DataList.add(newRow);
-        numberOfRows++;
         updateTableString();
         isEmpty = false;
         newRow.setTypeList((newRow.getTypeList()));
     }
     public void removeRow(DataRow toRemove){
         DataList.remove(toRemove);
-        numberOfRows--;
     }
     public void addColumn(String title){
         columnNames.add(title);
@@ -154,9 +140,6 @@ public class Table implements java.io.Serializable{
     public void insertValues(String values) throws GenericException {
         DataRow dataRow = new DataRow();
         dataRow.initialise(values, numberOfColumns,++highestID,false);
-        if(!isEmpty) {
-            //dataRow.checkTypes(typesOfValues);
-        }
         isEmpty = false;
         DataList.add(dataRow);
         updateTableString();
@@ -181,11 +164,12 @@ public class Table implements java.io.Serializable{
         }
     }
     public void joinTable(Table joiningTable,int keyAttribute,int foreignKeyAttribute) throws GenericException {
+
         columnNames.replaceAll(s -> TableName + "." + s);
         columnNames.remove(keyAttribute);
-        if(keyAttribute==0) {
-            columnNames.add(0, "id");
+        if(keyAttribute==0) {columnNames.add(0, "id");
         }else{columnNames.set(0, "id");}
+
         int newId=0;
         boolean valueFound;
          for(DataRow dataRow : DataList){
@@ -193,24 +177,23 @@ public class Table implements java.io.Serializable{
              String foreignKey = dataRow.getSpecificValue(keyAttribute);
              for(DataRow foreignRow : joiningTable.DataList){
                  String foreignValue = foreignRow.getSpecificValue(foreignKeyAttribute);
-                 if(valueFound){
-                    throw new GenericException("[ERROR] : Primary and foreign key has multiple matches in columns");
-                 }
+                 if(valueFound){throw new GenericException("[ERROR] : Primary and foreign key has multiple matches in columns");}
                  if(foreignKey.equals(foreignValue)){
                      dataRow.combine(foreignRow,keyAttribute,foreignKeyAttribute,newId++);
                      valueFound = true;
                  }
-             }
-             if(!valueFound){
-                 DataList.remove(dataRow);
-             }
+             }if(!valueFound){DataList.remove(dataRow);}
          }
+        joinColNames(joiningTable,foreignKeyAttribute);
+        updateTableString();
+    }
+
+    private void joinColNames(Table joiningTable, int foreignKeyAttribute){
         for(String title : joiningTable.columnNames){
             int titleIndex = joiningTable.columnNames.indexOf(title);
             if(titleIndex!=0 && titleIndex!=foreignKeyAttribute){
                 columnNames.add(joiningTable.TableName+"."+title);
             }
         }
-        updateTableString();
     }
 }
