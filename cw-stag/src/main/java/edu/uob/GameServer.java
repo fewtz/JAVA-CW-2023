@@ -1,5 +1,8 @@
 package edu.uob;
 
+import edu.uob.engine.GameEngine;
+import edu.uob.utilities.GenericException;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -13,6 +16,7 @@ import java.nio.file.Paths;
 public final class GameServer {
 
     private static final char END_OF_TRANSMISSION = 4;
+    GameEngine gameEngine;
 
     public static void main(String[] args) throws IOException {
         File entitiesFile = Paths.get("config" + File.separator + "basic-entities.dot").toAbsolutePath().toFile();
@@ -22,26 +26,30 @@ public final class GameServer {
     }
 
     /**
-    * Do not change the following method signature or we won't be able to mark your submission
-    * Instanciates a new server instance, specifying a game with some configuration files
-    *
     * @param entitiesFile The game configuration file containing all game entities to use in your game
     * @param actionsFile The game configuration file containing all game actions to use in your game
     */
     public GameServer(File entitiesFile, File actionsFile) {
-        // TODO implement your server logic here
+        try {
+            gameEngine = new GameEngine(entitiesFile, actionsFile);
+        }catch(GenericException e){
+            System.out.println(e.message);
+        }
     }
 
     /**
-    * Do not change the following method signature or we won't be able to mark your submission
-    * This method handles all incoming game commands and carries out the corresponding actions.</p>
-    *
     * @param command The incoming command to be processed
     */
     public String handleCommand(String command) {
         // TODO implement your server logic here
         return "";
     }
+
+
+
+
+
+
 
     /**
     * Do not change the following method signature or we won't be able to mark your submission

@@ -1,16 +1,12 @@
-package edu.uob;
+package edu.uob.engine;
 
-public abstract class GameEntity
-{
+public class EntityDescriptor {
     private String name;
     private String description;
 
-    public GameEntity(String name, String description)
-    {
-        this.name = name;
-        this.description = description;
-    }
+    EntityDescriptor(){
 
+    }
     public String getName()
     {
         return name;
