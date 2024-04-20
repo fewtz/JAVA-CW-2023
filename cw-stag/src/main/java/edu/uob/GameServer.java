@@ -33,7 +33,7 @@ public final class GameServer {
         try {
             gameEngine = new GameEngine(entitiesFile, actionsFile);
         }catch(GenericException e){
-            System.out.println(e.message);
+            System.out.println(e.toString());
         }
     }
 

@@ -11,8 +11,15 @@ public class GameEngine {
     ArrayList<GameAction> possibleActions;
     EntityParser entityParser = new EntityParser();
     ActionParser actionParser = new ActionParser();
+    ArrayList<GameEntity> allEntities = new ArrayList<>();
     public GameEngine(File entitiesFile, File actionsFile) throws GenericException {
-        locations =  entityParser.parse(entitiesFile);
-        possibleActions = actionParser.parse(actionsFile);
+        locations =  entityParser.parse(entitiesFile, allEntities);
+        possibleActions = actionParser.parse(actionsFile, allEntities);
+        for(Location location : locations){
+            System.out.print(location.getAsString()+"\n");
+        }
+        for(GameAction action : possibleActions){
+            System.out.print(action.getAsString()+"\n");
+        }
     }
 }
