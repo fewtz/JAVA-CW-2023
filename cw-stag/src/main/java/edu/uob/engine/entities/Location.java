@@ -7,9 +7,9 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class Location extends GameEntity {
-    ArrayList<Artefact> artefacts = new ArrayList<>();;
-    ArrayList<Furniture> furnitures = new ArrayList<>();;
-    ArrayList<Character> characters = new ArrayList<>();;
+    ArrayList<Artefact> artefacts = new ArrayList<>();
+    ArrayList<Furniture> furnitures = new ArrayList<>();
+    ArrayList<Character> characters = new ArrayList<>();
     ArrayList<Location> destinations = new ArrayList<>();
     StringBuilder builder = new StringBuilder();
     public Location(String name, String description, Graph graphInput){
@@ -72,5 +72,28 @@ public class Location extends GameEntity {
     }
     public String getAsString(){
         return builder.toString();
+    }
+    public ArrayList<Location> getDestinations(){
+        return destinations;
+    }
+    public ArrayList<Artefact> getArtefacts(){
+        return artefacts;
+    }
+    public void addArtefact(Artefact item){
+        artefacts.add(item);
+    }
+    public String getLocationContentsAsString(){
+       StringBuilder builderForContents = new StringBuilder();
+       for(Artefact artefact : artefacts){
+           builderForContents.append(artefact.getName()+": "+artefact.getDescription()+"\n");
+       }
+       for(Furniture furniture : furnitures){
+           builderForContents.append(furniture.getName()+": "+furniture.getDescription()+"\n");
+       }
+       builderForContents.append("Plus routes to:\n");
+       for(Location location : destinations){
+           builderForContents.append(location.getName() + "\n");
+       }
+       return builderForContents.toString();
     }
 }

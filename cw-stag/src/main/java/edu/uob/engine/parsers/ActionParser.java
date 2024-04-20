@@ -28,7 +28,6 @@ public class ActionParser extends ParserFramework {
             if(i%2!=0){
                 Element action = (Element) actions.item(i);
                 actionList.add(extractAction(action));
-
             }
         }
         return actionList;
@@ -57,6 +56,7 @@ public class ActionParser extends ParserFramework {
         newAction.setConsumed((Element)action.getElementsByTagName("consumed").item(0));
         newAction.setProduced((Element)action.getElementsByTagName("produced").item(0));
         newAction.setNarration((Element)action.getElementsByTagName("narration").item(0));
+        newAction.setActionTypeNonstandard();
         return newAction;
     }
 }

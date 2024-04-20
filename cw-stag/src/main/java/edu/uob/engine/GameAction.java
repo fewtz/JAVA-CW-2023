@@ -1,6 +1,7 @@
 package edu.uob.engine;
 import edu.uob.engine.entities.Artefact;
 import edu.uob.engine.entities.GameEntity;
+import edu.uob.engine.entities.Location;
 import edu.uob.engine.entities.Player;
 import edu.uob.utilities.GenericException;
 import org.w3c.dom.Element;
@@ -14,7 +15,7 @@ public class GameAction{
     private GameEntity consumed;
     private GameEntity produced;
     private String narration;
-
+    private ActionType actionType;
     private StringBuilder builder= new StringBuilder();
 
     public GameAction(ArrayList<GameEntity> entitiesInput){
@@ -59,7 +60,8 @@ public class GameAction{
         if(phrases.getLength()==0){return null;} //again, can this be 0?
         String entityName = phrases.item(0).getTextContent();
         GameEntity entity = entitySearch(entityName);
-       // if(entity==null){throw new GenericException("Error: unknown entity in action initiation");}
+        if(entity==null){throw new GenericException("Error: unknown entity in action initiation");}//
+
         builder.append(entityName+" ");
         return entity;
     }
@@ -84,7 +86,6 @@ public class GameAction{
         return false;
     }
     public void checkEntities(ArrayList<GameEntity> entities){
-
         for(GameEntity entity : entities){
             boolean hasAppeared=false;
             if(entity.equals(this)){
@@ -100,10 +101,89 @@ public class GameAction{
             }
         }
     }
+    public void setActionLook(){
+        actionType = ActionType.look;
+        triggers.add("look");
+    }
+    public void setActionGet(){
+        actionType = ActionType.get;
+        triggers.add("get");
+    }
+    public void setActionDrop(){
+        actionType = ActionType.drop;
+        triggers.add("drop");
+    }
+    public void setActionInv(){
+        actionType = ActionType.inv;
+        triggers.add("inv");
+        triggers.add("inventory");
+    }
+    public void setActionGoTo(){
+        actionType = ActionType.goTo;
+        triggers.add("goto");
+    }
+    public void setActionTypeNonstandard(){
+        actionType = ActionType.nonstandard;
+    }
 
-    public String execute(Player player) throws GenericException {
-        player.remove(consumed);
-        player.add(produced);
+    public String execute(Player player, ArrayList<GameEntity> specifiedEntities) throws GenericException {
+        switch(actionType){
+            case nonstandard:
+                player.remove(consumed);
+                player.add(produced);
+                break;
+            case goTo:
+                processGoTo(player,specifiedEntities);
+                break;
+            case get:
+                processGet(player,specifiedEntities);
+                break;
+            case drop:
+                processDrop(player,specifiedEntities);
+                break;
+            case inv:
+                processInv(player);
+                break;
+            case look:
+                processLook(player);
+                break;
+        }
         return narration;
     }
+    private void processGoTo(Player player ,ArrayList<GameEntity> specifiedEntities) throws GenericException {
+       if(specifiedEntities.size()!=1){throw new GenericException("Error: only one entity can be specified in a goto");}
+       for(Location location : player.getLocation().getDestinations()){
+           if(location.equals(specifiedEntities.get(0))){
+               player.setLocation(location);
+               narration = "You are now in " + location.getName();
+               return;
+           }
+       }
+       throw new GenericException("Error: you cannot get there from here");
+    }
+    private void processGet(Player player ,ArrayList<GameEntity> specifiedEntities)throws GenericException{
+        if(specifiedEntities.size()!=1){throw new GenericException("Error: only one entity can be specified in a get");}
+        player.getItem(specifiedEntities.get(0));
+        narration = "You picked up the " + specifiedEntities.get(0).getName();
+    }
+    private void processDrop(Player player ,ArrayList<GameEntity> specifiedEntities) throws GenericException {
+        if(specifiedEntities.size()!=1){throw new GenericException("Error: only one entity can be specified in a drop");}
+        player.dropItem(specifiedEntities.get(0));
+        narration = "You dropped up the " + specifiedEntities.get(0).getName();
+    }
+    private void processInv(Player player){
+        narration = "The items in your inventory are as follows:\n" + player.getInvAsString();
+    }
+    private void processLook(Player player){
+        narration = "You look around and see:"+ player.getLocation().getLocationContentsAsString();
+    }
 }
+enum ActionType {
+    look,
+    get,
+    drop,
+    inv,
+    goTo,
+    nonstandard
+}
+

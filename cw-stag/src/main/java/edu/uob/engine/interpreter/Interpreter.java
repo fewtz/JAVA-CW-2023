@@ -38,7 +38,7 @@ public class Interpreter {
         return executeAction();
     }
     private String executeAction( ) throws GenericException {
-        return currentActions.get(0).execute(player);
+        return currentActions.get(0).execute(player,specifiedEntities);
     }
     private void checkConsistentEntities(){
         currentActions.get(0).checkEntities(specifiedEntities);
