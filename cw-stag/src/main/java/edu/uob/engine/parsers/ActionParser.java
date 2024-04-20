@@ -1,8 +1,6 @@
 package edu.uob.engine.parsers;
-import edu.uob.engine.EntityDescriptor;
 import edu.uob.engine.GameAction;
-import edu.uob.engine.GameEngine;
-import com.alexmerz.graphviz.Parser;
+
 import java.util.ArrayList;
 import java.io.IOException;
 import java.io.File;
@@ -12,7 +10,6 @@ import javax.xml.parsers.DocumentBuilder;
 
 import edu.uob.engine.entities.GameEntity;
 import edu.uob.utilities.GenericException;
-import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

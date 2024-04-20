@@ -1,5 +1,7 @@
 package edu.uob.engine;
+import edu.uob.engine.entities.Artefact;
 import edu.uob.engine.entities.GameEntity;
+import edu.uob.engine.entities.Player;
 import edu.uob.utilities.GenericException;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -74,5 +76,34 @@ public class GameAction{
     }
     public String getAsString(){
         return builder.toString();
+    }
+    public boolean isTrigger(String token){
+        for(String string : triggers){
+            if(string.equalsIgnoreCase(token)){return true;}
+        }
+        return false;
+    }
+    public void checkEntities(ArrayList<GameEntity> entities){
+
+        for(GameEntity entity : entities){
+            boolean hasAppeared=false;
+            if(entity.equals(this)){
+                hasAppeared = true;
+            }
+            for(GameEntity subject : subjects){
+                if(entity.equals(subject)){
+                    hasAppeared =true;
+                }
+            }
+            if(!hasAppeared){
+                throw new RuntimeException("Error: specified entity appears in the scope of an action not currently triggered");
+            }
+        }
+    }
+
+    public String execute(Player player) throws GenericException {
+        player.remove(consumed);
+        player.add(produced);
+        return narration;
     }
 }
