@@ -7,6 +7,6 @@ public class GenericException extends Exception {
     }
     @Override
     public String toString(){
-        return "";
+        return message;
     }
 }

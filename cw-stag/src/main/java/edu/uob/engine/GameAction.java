@@ -12,10 +12,10 @@ public class GameAction{
     private ArrayList<GameEntity> allEntities;
     private ArrayList<String> triggers = new ArrayList<>();
     private ArrayList<GameEntity> subjects = new ArrayList<>();
-    private GameEntity consumed;
-    private GameEntity produced;
+    private GameEntity consumed=null;
+    private GameEntity produced=null;
     private String narration;
-    private ActionType actionType;
+    private ActionType actionType=ActionType.nonstandard;
     private StringBuilder builder= new StringBuilder();
 
     public GameAction(ArrayList<GameEntity> entitiesInput){
@@ -85,7 +85,10 @@ public class GameAction{
         }
         return false;
     }
-    public void checkEntities(ArrayList<GameEntity> entities){
+    public void checkEntities(ArrayList<GameEntity> entities) throws GenericException {
+        if (actionType != ActionType.nonstandard) {
+            return;
+        }
         for(GameEntity entity : entities){
             boolean hasAppeared=false;
             if(entity.equals(this)){
@@ -97,7 +100,7 @@ public class GameAction{
                 }
             }
             if(!hasAppeared){
-                throw new RuntimeException("Error: specified entity appears in the scope of an action not currently triggered");
+                throw new GenericException("Error: specified entity appears in the scope of an action not currently triggered");
             }
         }
     }
@@ -126,11 +129,17 @@ public class GameAction{
         actionType = ActionType.nonstandard;
     }
 
-    public String execute(Player player, ArrayList<GameEntity> specifiedEntities) throws GenericException {
+    public String execute(Player player,ArrayList<Player> players, ArrayList<GameEntity> specifiedEntities) throws GenericException {
         switch(actionType){
             case nonstandard:
-                player.remove(consumed);
-                player.add(produced);
+                if(consumed!=null) {
+                    if (!(player.remove(consumed) || player.getLocation().remove(consumed))) {
+                        throw new GenericException("You do not have the items to perform this action.");
+                    }
+                }
+                if(produced!=null) {
+                    player.add(produced);
+                }
                 break;
             case goTo:
                 processGoTo(player,specifiedEntities);
@@ -145,7 +154,7 @@ public class GameAction{
                 processInv(player);
                 break;
             case look:
-                processLook(player);
+                processLook(player,players);
                 break;
         }
         return narration;
@@ -164,6 +173,7 @@ public class GameAction{
     private void processGet(Player player ,ArrayList<GameEntity> specifiedEntities)throws GenericException{
         if(specifiedEntities.size()!=1){throw new GenericException("Error: only one entity can be specified in a get");}
         player.getItem(specifiedEntities.get(0));
+        player.getLocation().remove(specifiedEntities.get(0));
         narration = "You picked up the " + specifiedEntities.get(0).getName();
     }
     private void processDrop(Player player ,ArrayList<GameEntity> specifiedEntities) throws GenericException {
@@ -173,9 +183,29 @@ public class GameAction{
     }
     private void processInv(Player player){
         narration = "The items in your inventory are as follows:\n" + player.getInvAsString();
+
     }
-    private void processLook(Player player){
-        narration = "You look around and see:"+ player.getLocation().getLocationContentsAsString();
+    private ArrayList<Player> getOtherPlayersHere(Player player,ArrayList<Player> players){
+        ArrayList<Player> others = new ArrayList<>();
+        for(Player other : players){
+            if(!other.equals(player) && other.getLocation().equals(player.getLocation())){
+                others.add(other);
+            }
+        }
+        return others;
+    }
+    private void processLook(Player player,ArrayList<Player> players){
+        narration = "You look around "+player.getLocation().getDescription() +" and see:\n"+ player.getLocation().getLocationContentsAsString();
+        ArrayList<Player> othersHere = getOtherPlayersHere(player,players);
+        if(othersHere.size()==1){
+            narration+= "You also see a human named:\n"+othersHere.get(0).getName()+"\n";
+        }
+        if(othersHere.size()>1){
+            narration+= "You also see a number of other humans named:\n";
+            for(Player otherPlayer : othersHere){
+                narration+=otherPlayer.getName()+"\n";
+            }
+        }
     }
 }
 enum ActionType {

@@ -9,8 +9,9 @@ public class Player extends GameEntity{
     ArrayList<Artefact> inventory = new ArrayList<>();
     int health = 3;
     Location currentLocation; // what should this be initalized to ?
-    public Player(String name, String description, Graph graphInput) {
+    public Player(String name, String description, Graph graphInput, Location locationInput) {
         super(name, description, graphInput);
+        currentLocation = locationInput;
     }
     public Location getLocation(){
         return currentLocation;
@@ -30,13 +31,12 @@ public class Player extends GameEntity{
             }
         }
     }
-    public void remove(GameEntity item) throws GenericException {
+    public boolean remove(GameEntity item) throws GenericException {
         if(item.getName().equals("health")){
             health--;
+            return true;
         }else{
-            if(!inventory.remove(item)){
-                throw new GenericException("Error: tried to remove an item which the player didnt have");
-            }
+            return inventory.remove(item);
         }
     }
     public void getItem(GameEntity item) throws GenericException {

@@ -24,26 +24,27 @@ public class GameEngine {
         setupStandardActions();
         interpreter = new Interpreter(players,locations, possibleActions, allEntities);
     }
-
+    public String handleCommand(String command) throws GenericException {
+        return interpreter.handleCommand(command);
+    }
     private void setupStandardEntities(){
         allEntities.add(new Health("health","The source of your vitality",null));
     }
-
     private void setupStandardActions(){
         GameAction look = new GameAction(allEntities);
         look.setActionLook();
-        possibleActions.add(new GameAction(allEntities));
+        possibleActions.add(look);
         GameAction inv = new GameAction(allEntities);
         inv.setActionInv();
-        possibleActions.add(new GameAction(allEntities));
+        possibleActions.add(inv);
         GameAction get = new GameAction(allEntities);
         get.setActionGet();
-        possibleActions.add(new GameAction(allEntities));
+        possibleActions.add(get);
         GameAction drop = new GameAction(allEntities);
         drop.setActionDrop();
-        possibleActions.add(new GameAction(allEntities));
+        possibleActions.add(drop);
         GameAction goTo = new GameAction(allEntities);
         goTo.setActionGoTo();
-        possibleActions.add(new GameAction(allEntities));
+        possibleActions.add(goTo);
     }
 }

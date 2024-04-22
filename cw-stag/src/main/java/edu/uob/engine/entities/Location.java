@@ -2,6 +2,7 @@ package edu.uob.engine.entities;
 
 import com.alexmerz.graphviz.objects.Graph;
 import com.alexmerz.graphviz.objects.Node;
+import edu.uob.utilities.GenericException;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -90,10 +91,17 @@ public class Location extends GameEntity {
        for(Furniture furniture : furnitures){
            builderForContents.append(furniture.getName()+": "+furniture.getDescription()+"\n");
        }
+       for(Character character : characters){
+           builderForContents.append(character.getName()+": "+character.getDescription()+"\n");
+       }
        builderForContents.append("Plus routes to:\n");
        for(Location location : destinations){
            builderForContents.append(location.getName() + "\n");
        }
        return builderForContents.toString();
+    }
+    public boolean remove(GameEntity item) throws GenericException {
+        return artefacts.remove(item)|| furnitures.remove(item);
+
     }
 }

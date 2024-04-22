@@ -26,6 +26,7 @@ public class EntityParser extends ParserFramework{
         Graph wholeDocument = parser.getGraphs().get(0);
         ArrayList<Graph> sections = wholeDocument.getSubgraphs();
         locations = parseLocations(sections.get(0).getSubgraphs());
+        if(locations.size()==0){throw new GenericException("Error: cannot have a game with no locations");}
         setupPaths(sections.get(1));
         return locations;
     }

@@ -41,8 +41,14 @@ public final class GameServer {
     * @param command The incoming command to be processed
     */
     public String handleCommand(String command) {
-        // TODO implement your server logic here
-        return "";
+        String output = null;
+        try{
+            output = gameEngine.handleCommand(command) + "\n";
+        }catch(GenericException e){
+            System.out.println(e.toString());
+            return e.toString();
+        }
+        return output;
     }
 
 
