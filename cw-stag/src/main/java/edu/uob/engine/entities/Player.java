@@ -19,8 +19,11 @@ public class Player extends GameEntity{
     public void setLocation(Location location){
         currentLocation = location;
     }
-    public void add(GameEntity item){
+    public void add(GameEntity item) throws GenericException {
         if(item.getName().equals("health")){
+            if(health>=3){
+                throw new GenericException("You are already as healthy as can be");
+            }
             health++;
         }else{
             if(item.getClass()== Artefact.class){
