@@ -101,7 +101,21 @@ public class Location extends GameEntity {
        return builderForContents.toString();
     }
     public boolean remove(GameEntity item) throws GenericException {
-        return artefacts.remove(item)|| furnitures.remove(item);
-
+        return artefacts.remove(item)|| furnitures.remove(item)||item.getClass()== Location.class||
+                characters.remove(item) || item.getName().equals("health");
+    }
+    public boolean containsSubject(GameEntity entity){
+        return artefacts.contains(entity)|| furnitures.contains(entity) || characters.contains(entity);
+    }
+    public void add(GameEntity item) throws GenericException {
+        if(item.getClass() == Artefact.class){
+            artefacts.add((Artefact) item);
+        }else if(item.getClass() == Furniture.class){
+            furnitures.add((Furniture) item);
+        }else if(item.getClass() == Character.class){
+            characters.add((Character) item);
+        } else if(item.getClass() == Location.class) {
+            destinations.add((Location) item);
+        }
     }
 }

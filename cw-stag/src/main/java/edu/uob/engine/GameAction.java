@@ -17,11 +17,14 @@ public class GameAction{
     private String narration;
     private ActionType actionType=ActionType.nonstandard;
     private StringBuilder builder= new StringBuilder();
+    private Location storeRoom;
+    private ArrayList<Location> locations;
 
-    public GameAction(ArrayList<GameEntity> entitiesInput){
+    public GameAction(ArrayList<GameEntity> entitiesInput, Location storeRoomInput,ArrayList<Location> locationsInput ){
         allEntities = entitiesInput;
+        storeRoom = storeRoomInput;
+        locations = locationsInput;
     }
-
     public void setTriggers(Element input) throws GenericException {
         NodeList phrases = input.getElementsByTagName("keyphrase");
         builder.append("triggers: ");
@@ -85,23 +88,24 @@ public class GameAction{
         }
         return false;
     }
-    public void checkEntities(ArrayList<GameEntity> entities) throws GenericException {
-        if (actionType != ActionType.nonstandard) {
-            return;
-        }
+    public void checkEntities(ArrayList<GameEntity> entities,Player player) throws GenericException {
+        if(actionType!=ActionType.nonstandard){return;}
         for(GameEntity entity : entities){
             boolean hasAppeared=false;
-            if(entity.equals(this)){
-                hasAppeared = true;
-            }
-            for(GameEntity subject : subjects){
-                if(entity.equals(subject)){
-                    hasAppeared =true;
+            for(GameEntity subject : subjects) {
+                if (entity.equals(subject)) {
+                    hasAppeared = true;
                 }
             }
-            if(!hasAppeared){
+            if (!hasAppeared) {
                 throw new GenericException("Error: specified entity appears in the scope of an action not currently triggered");
             }
+        }
+        for(GameEntity subject : subjects){
+            boolean isHere = false;
+            isHere = isHere || player.containsSubject(subject);
+            isHere = isHere || player.getLocation().containsSubject(subject);
+            if(!isHere){throw new GenericException("You do not have everything you need to do that here.");}
         }
     }
     public void setActionLook(){
@@ -125,6 +129,10 @@ public class GameAction{
         actionType = ActionType.goTo;
         triggers.add("goto");
     }
+    public void setActionHealth(){
+        actionType=ActionType.health;
+        triggers.add("health");
+    }
     public void setActionTypeNonstandard(){
         actionType = ActionType.nonstandard;
     }
@@ -133,12 +141,12 @@ public class GameAction{
         switch(actionType){
             case nonstandard:
                 if(consumed!=null) {
-                    if (!(player.remove(consumed) || player.getLocation().remove(consumed))) {
-                        throw new GenericException("You do not have the items to perform this action.");
-                    }
+                    consumeItem(player);
                 }
                 if(produced!=null) {
-                    player.add(produced);
+                    player.getLocation().add(produced);
+                    if(produced.getName().equals("health")){player.add(produced);}
+                    if(!storeRoom.remove(produced)){throw new GenericException("Something strange happened in the storeroom..");}
                 }
                 break;
             case goTo:
@@ -156,8 +164,21 @@ public class GameAction{
             case look:
                 processLook(player,players);
                 break;
+            case health:
+                processHealth(player);
+            default:
+                break;
         }
         return narration;
+    }
+    private void consumeItem(Player player) throws GenericException {
+        boolean isRemoved=false;
+        isRemoved = isRemoved ||player.remove(consumed);
+        for(Location location : locations){
+            isRemoved = isRemoved|| location.remove(consumed);
+        }
+        if(!isRemoved){throw new GenericException("A consumption item does not exist");}
+        storeRoom.add(consumed);
     }
     private void processGoTo(Player player ,ArrayList<GameEntity> specifiedEntities) throws GenericException {
        if(specifiedEntities.size()!=1){throw new GenericException("Error: only one entity can be specified in a goto");}
@@ -183,7 +204,9 @@ public class GameAction{
     }
     private void processInv(Player player){
         narration = "The items in your inventory are as follows:\n" + player.getInvAsString();
-
+    }
+    private void processHealth(Player player){
+        narration = "Current health:" + player.getHealth();
     }
     private ArrayList<Player> getOtherPlayersHere(Player player,ArrayList<Player> players){
         ArrayList<Player> others = new ArrayList<>();
@@ -214,6 +237,7 @@ enum ActionType {
     drop,
     inv,
     goTo,
+    health,
     nonstandard
 }
 

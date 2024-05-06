@@ -9,6 +9,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 
 import edu.uob.engine.entities.GameEntity;
+import edu.uob.engine.entities.Location;
 import edu.uob.utilities.GenericException;
 import org.xml.sax.SAXException;
 import org.w3c.dom.Document;
@@ -17,7 +18,12 @@ import org.w3c.dom.NodeList;
 
 public class ActionParser extends ParserFramework {
     ArrayList<GameEntity> allEntities;
-    public ActionParser(){}
+    Location storeRoom;
+    ArrayList<Location> locations;
+    public ActionParser(Location storeRoomInput,ArrayList<Location> locationsInput){
+        storeRoom = storeRoomInput;
+        locations = locationsInput;
+    }
     public ArrayList<GameAction> parse(File entitiesFile, ArrayList<GameEntity> entities) throws GenericException {
         allEntities = entities;
 
@@ -50,7 +56,7 @@ public class ActionParser extends ParserFramework {
     }
 
     private GameAction extractAction(Element action) throws GenericException {
-        GameAction newAction = new GameAction(allEntities);
+        GameAction newAction = new GameAction(allEntities,storeRoom,locations);
         newAction.setTriggers((Element)action.getElementsByTagName("triggers").item(0));
         newAction.setSubjects((Element)action.getElementsByTagName("subjects").item(0));
         newAction.setConsumed((Element)action.getElementsByTagName("consumed").item(0));

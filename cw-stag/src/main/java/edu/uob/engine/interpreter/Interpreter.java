@@ -40,7 +40,7 @@ public class Interpreter {
         return currentActions.get(0).execute(player,players,specifiedEntities);
     }
     private void checkConsistentEntities() throws GenericException {
-        currentActions.get(0).checkEntities(specifiedEntities);
+        currentActions.get(0).checkEntities(specifiedEntities,player);
     }
     private void searchEntities(ArrayList<String> tokens) throws GenericException {
         specifiedEntities = new ArrayList<>();
@@ -51,7 +51,6 @@ public class Interpreter {
                 }
             }
         }
-        //if(specifiedEntities.size()==0){throw new GenericException("Error: no entities specified in input phrase");}
     }
     private void searchTriggerPhrase(ArrayList<String> tokens) throws GenericException {
         currentActions = new ArrayList<>();
@@ -62,7 +61,7 @@ public class Interpreter {
                 }
             }
         }
-        if(currentActions.size()==0){throw new GenericException("Error: no trigger word in input phrase");}
+        if(currentActions.isEmpty()){throw new GenericException("Error: no trigger word in input phrase");}
         if(currentActions.size()>1){throw new GenericException("Error: more than one trigger word in input phrase");}
     }
     private void searchForPlayer() throws GenericException {

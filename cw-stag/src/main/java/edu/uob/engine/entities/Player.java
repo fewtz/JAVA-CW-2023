@@ -9,9 +9,11 @@ public class Player extends GameEntity{
     ArrayList<Artefact> inventory = new ArrayList<>();
     int health = 3;
     Location currentLocation; // what should this be initalized to ?
+    Location startLocation;
     public Player(String name, String description, Graph graphInput, Location locationInput) {
         super(name, description, graphInput);
         currentLocation = locationInput;
+        startLocation = locationInput;
     }
     public Location getLocation(){
         return currentLocation;
@@ -37,10 +39,22 @@ public class Player extends GameEntity{
     public boolean remove(GameEntity item) throws GenericException {
         if(item.getName().equals("health")){
             health--;
+            if(health<=0){die();}
             return true;
         }else{
             return inventory.remove(item);
         }
+    }
+    private void die() throws GenericException {
+        for(int i=inventory.size()-1 ;i>=0 ;i--){
+            Artefact item = inventory.get(i);
+            inventory.remove(item);
+            currentLocation.addArtefact(item);
+        }
+        health = 3;
+        currentLocation = startLocation;
+        throw new GenericException("You have died. All of your items have been dropped,"
+                +"and you have been returned to the start of the game.");
     }
     public void getItem(GameEntity item) throws GenericException {
         for(Artefact artefact : currentLocation.getArtefacts()){
@@ -52,10 +66,12 @@ public class Player extends GameEntity{
         throw new GenericException("Error: item does not exist in location for get");
     }
     public void dropItem(GameEntity item) throws GenericException{
-        for(Artefact artefact : inventory){
+        for(int i=inventory.size()-1;i>=0; i--){
+            Artefact artefact = inventory.get(i);
             if (artefact.equals(item)){
                 remove(item);
                 currentLocation.addArtefact(artefact);
+                return;
             }
         }
         throw new GenericException("Error: item does not exist in inventory");
@@ -66,5 +82,9 @@ public class Player extends GameEntity{
             builder.append(item.getName()+"\n");
         }
         return builder.toString();
+    }
+    public String getHealth(){return Integer.toString(health);}
+    public boolean containsSubject(GameEntity entity){
+        return inventory.contains(entity);
     }
 }
