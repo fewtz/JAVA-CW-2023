@@ -102,7 +102,14 @@ public class Location extends GameEntity {
     }
     public boolean remove(GameEntity item) throws GenericException {
         return artefacts.remove(item)|| furnitures.remove(item)||item.getClass()== Location.class||
-                characters.remove(item) || item.getName().equals("health");
+                characters.remove(item) || item.getName().equals("health") || removePath(item);
+    }
+    private boolean removePath(GameEntity item){
+        if(item.getClass()== Location.class) {return false;}
+        for (Location location : destinations){
+            if(item.equals(location)){destinations.remove(item);return true;}
+        }
+        return false;
     }
     public boolean containsSubject(GameEntity entity){
         return artefacts.contains(entity)|| furnitures.contains(entity) || characters.contains(entity);

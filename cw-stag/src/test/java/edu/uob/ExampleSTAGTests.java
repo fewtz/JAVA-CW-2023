@@ -165,7 +165,7 @@ class ExampleSTAGTests {
       assertFalse(response.toLowerCase().contains("you cut down"),"");
       response = sendCommandToServer("simon: chop");
       assertFalse(response.toLowerCase().contains("you cut down"),"");
-      response = sendCommandToServer("simon: chop tree cut axe");
+      response = sendCommandToServer("simon: chop tree cut axe drink");
       assertTrue(response.toLowerCase().contains("you cut down"),"");
   }
   @Test
@@ -174,7 +174,7 @@ class ExampleSTAGTests {
       response = sendCommandToServer("simon: drink potion");
       assertFalse(response.toLowerCase().contains("you are already"),"");
       response = sendCommandToServer("simon: goto cabin");
-      response = sendCommandToServer("simon: drink potion");
+      response = sendCommandToServer("simon: drink drink potion potion");
       assertTrue(response.toLowerCase().contains("you are already"),"");
   }
   @Test
@@ -220,4 +220,6 @@ class ExampleSTAGTests {
       response = sendCommandToServer("freya: goto cellar");
       assertTrue(response.toLowerCase().contains("you are now in"),"");
   }
+
+
 }

@@ -161,14 +161,14 @@ public class GameAction{
                 break;
             case health:
                 processHealth(player);
+                break;
             default:
                 break;
         }
         return narration;
     }
     private void consumeItem(Player player) throws GenericException {
-        boolean isRemoved=false;
-        isRemoved = isRemoved ||player.remove(consumed);
+        boolean isRemoved = player.remove(consumed);
         for(Location location : locations){
             isRemoved = isRemoved|| location.remove(consumed);
         }

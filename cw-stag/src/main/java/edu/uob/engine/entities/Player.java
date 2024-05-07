@@ -6,10 +6,10 @@ import edu.uob.utilities.GenericException;
 import java.util.ArrayList;
 
 public class Player extends GameEntity{
-    ArrayList<Artefact> inventory = new ArrayList<>();
-    int health = 3;
-    Location currentLocation; // what should this be initalized to ?
-    Location startLocation;
+    private ArrayList<Artefact> inventory = new ArrayList<>();
+    private int health = 3;
+    private Location currentLocation; // what should this be initalized to ?
+    private Location startLocation;
     public Player(String name, String description, Graph graphInput, Location locationInput) {
         super(name, description, graphInput);
         currentLocation = locationInput;

@@ -24,10 +24,10 @@ public class ActionParser extends ParserFramework {
         storeRoom = storeRoomInput;
         locations = locationsInput;
     }
-    public ArrayList<GameAction> parse(File entitiesFile, ArrayList<GameEntity> entities) throws GenericException {
+    public ArrayList<GameAction> parse(File actionFile, ArrayList<GameEntity> entities) throws GenericException {
         allEntities = entities;
 
-        NodeList actions = extractActions(entitiesFile);
+        NodeList actions = extractActions(actionFile);
 
         ArrayList<GameAction> actionList = new ArrayList<>();
         for(int i=0; i<actions.getLength();i++){
@@ -38,12 +38,12 @@ public class ActionParser extends ParserFramework {
         }
         return actionList;
     }
-    private NodeList extractActions(File entitiesFile) throws GenericException {
+    private NodeList extractActions(File actionFile) throws GenericException {
         DocumentBuilder builder = null;
         Document document = null;
         try {
             builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            document = builder.parse("config" + File.separator + "basic-actions.xml");
+            document = builder.parse(actionFile);
         } catch (ParserConfigurationException e) {
             throw new GenericException("ERROR: Action parser configuration error");
         } catch (SAXException e) {
