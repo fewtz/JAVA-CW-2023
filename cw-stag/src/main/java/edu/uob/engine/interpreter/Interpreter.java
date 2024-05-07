@@ -27,7 +27,7 @@ public class Interpreter {
     }
 
     public String handleCommand(String command) throws GenericException {
-        if(command.length()==0){return "";}
+        if(command.isEmpty()){return "";}
         command = determinePlayerName(command);
         ArrayList<String> tokens = tokenize(command);
         searchForPlayer();
@@ -36,11 +36,26 @@ public class Interpreter {
         checkConsistentEntities();
         return executeAction();
     }
-    private String executeAction( ) throws GenericException {
-        return currentActions.get(0).execute(player,players,specifiedEntities);
+    private void searchForPlayer() throws GenericException {
+        for(Player playerPotential : players){
+            if(playerName.equals(playerPotential.getName())){player = playerPotential;return;}
+        }
+        createNewPlayer();
     }
-    private void checkConsistentEntities() throws GenericException {
-        currentActions.get(0).checkEntities(specifiedEntities,player);
+    private void searchTriggerPhrase(ArrayList<String> tokens) throws GenericException {
+        currentActions = new ArrayList<>();
+        for(String token : tokens){
+            for(GameAction possibleAction : possibleActions){
+                if(possibleAction.isTrigger(token)){
+                    boolean alreadyFoundAction = false;
+                    for(GameAction otherAction  :currentActions){
+                        if(otherAction.equals(possibleAction)){alreadyFoundAction=true;}
+                    }
+                    if(!alreadyFoundAction){currentActions.add(possibleAction);}
+                }
+            }
+        }
+        if(currentActions.isEmpty()){throw new GenericException("What do you do?");}
     }
     private void searchEntities(ArrayList<String> tokens) throws GenericException {
         specifiedEntities = new ArrayList<>();
@@ -52,30 +67,23 @@ public class Interpreter {
             }
         }
     }
-    private void searchTriggerPhrase(ArrayList<String> tokens) throws GenericException {
-        currentActions = new ArrayList<>();
-        for(String token : tokens){
-            for(GameAction possibleAction : possibleActions){
-                if(possibleAction.isTrigger(token)){
-                    currentActions.add(possibleAction);
-                }
+    private void checkConsistentEntities() throws GenericException {
+        for(int i=currentActions.size()-1;i>=0;i--){
+            GameAction action = currentActions.get(i);
+            if(!action.checkEntities(specifiedEntities,player)){
+                currentActions.remove(action);
             }
         }
-        if(currentActions.isEmpty()){throw new GenericException("Error: no trigger word in input phrase");}
-        if(currentActions.size()>1){throw new GenericException("Error: more than one trigger word in input phrase");}
+        if(currentActions.isEmpty()){throw new GenericException("What would you like to do that with?");}
+        if(currentActions.size()>1){throw new GenericException("That was ambiguous - what do you do?");}
     }
-    private void searchForPlayer() throws GenericException {
-        for(Player playerPotential : players){
-            if(playerName.equals(playerPotential.getName())){player = playerPotential;return;}
-        }
-        createNewPlayer();
+    private String executeAction( ) throws GenericException {
+        return currentActions.get(0).execute(player,players,specifiedEntities);
     }
-
     private void createNewPlayer(){
         player = new Player(playerName,"You",null,locations.get(0));
         players.add(player);
     }
-
     private String determinePlayerName(String command) throws GenericException {
         int charCounter = 0;
         StringBuilder builder = new StringBuilder();
@@ -92,7 +100,6 @@ public class Interpreter {
         if (playerName==null){throw new GenericException("Error: Player not specified correctly");}
         return command.substring(++charCounter);
     }
-
     private ArrayList<String> tokenize(String command){
         ArrayList<String> tokens = new ArrayList<>();
         StringBuilder builder = new StringBuilder();
@@ -109,7 +116,9 @@ public class Interpreter {
                     builder = new StringBuilder();
                     break;
                 default :
-                    builder.append(character);
+                    if(Character.isAlphabetic(character)) {
+                        builder.append(character);
+                    }
             }
         }
         tokens.add(builder.toString());

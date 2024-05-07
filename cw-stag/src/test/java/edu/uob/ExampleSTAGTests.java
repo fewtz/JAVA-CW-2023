@@ -116,6 +116,8 @@ class ExampleSTAGTests {
       assertTrue(response.toLowerCase().contains("he fights back"),"could not attack the elf..");
       response = sendCommandToServer("simon: attack the elf");
       assertTrue(response.toLowerCase().contains("he fights back"),"could not attack the elf..");
+      response = sendCommandToServer("simon: get elf");
+      assertFalse(response.toLowerCase().contains("you picked up"),"");
       response = sendCommandToServer("simon: fight the stupid fucking elf");
       assertTrue(response.toLowerCase().contains("died"),"you did not die ?");
       response = sendCommandToServer("simon: look");
@@ -139,11 +141,83 @@ class ExampleSTAGTests {
       assertTrue(response.toLowerCase().contains("the items in your inventory are as follows"),"");
       response = sendCommandToServer("simon: InV");
       assertTrue(response.toLowerCase().contains("the items in your inventory are as follows"),"");
-      response = sendCommandToServer("simon: INVENTORY");
+      response = sendCommandToServer("simon: INVENTORY?");
       assertTrue(response.toLowerCase().contains("the items in your inventory are as follows"),"");
       response = sendCommandToServer("simon: please show me my inv");
       assertTrue(response.toLowerCase().contains("the items in your inventory are as follows"),"");
       response = sendCommandToServer("simon: what is in my Inventory at the moment?");
       assertTrue(response.toLowerCase().contains("the items in your inventory are as follows"),"");
+      response = sendCommandToServer("simon: health inventory");
+      assertFalse(response.toLowerCase().contains("3"),"two valid commands worked yikes");
+      response = sendCommandToServer("simon: get axe potion");
+      assertFalse(response.toLowerCase().contains("you picked up"),"");
+      response = sendCommandToServer("simon: get potion");
+      assertTrue(response.toLowerCase().contains("you picked up"),"");
+      response = sendCommandToServer("simon: drink potion chop ");
+      assertTrue(response.toLowerCase().contains("you are already as healthy"),"");
+      response = sendCommandToServer("simon: get axe");
+      assertTrue(response.toLowerCase().contains("you picked up"),"");
+      response = sendCommandToServer("simon: goto forest");
+      assertTrue(response.toLowerCase().contains("you are now in"),"");
+      response = sendCommandToServer("simon: chop tree elf");
+      assertFalse(response.toLowerCase().contains("you cut down"),"");
+      response = sendCommandToServer("simon: chop tree key");
+      assertFalse(response.toLowerCase().contains("you cut down"),"");
+      response = sendCommandToServer("simon: chop");
+      assertFalse(response.toLowerCase().contains("you cut down"),"");
+      response = sendCommandToServer("simon: chop tree cut axe");
+      assertTrue(response.toLowerCase().contains("you cut down"),"");
+  }
+  @Test
+  void weirdOne(){
+      String response = sendCommandToServer("simon: goto forest");
+      response = sendCommandToServer("simon: drink potion");
+      assertFalse(response.toLowerCase().contains("you are already"),"");
+      response = sendCommandToServer("simon: goto cabin");
+      response = sendCommandToServer("simon: drink potion");
+      assertTrue(response.toLowerCase().contains("you are already"),"");
+  }
+  @Test
+  void testingMultiplayer(){
+      String response = sendCommandToServer("simon: inv");
+      assertTrue(response.toLowerCase().contains("the items in your inventory are as follows"),"");
+      response = sendCommandToServer("freya: look");
+      assertTrue(response.toLowerCase().contains("you also see a"),"");
+      response = sendCommandToServer("freya: get axe");
+      assertTrue(response.toLowerCase().contains("you picked up"),"");
+      response = sendCommandToServer("simon: goto forest");
+      assertTrue(response.toLowerCase().contains("you are now in"),"");
+      response = sendCommandToServer("freya: goto forest");
+      assertTrue(response.toLowerCase().contains("you are now in"),"");
+      response = sendCommandToServer("simon: chop tree");
+      assertFalse(response.toLowerCase().contains("you cut down"),"");
+      response = sendCommandToServer("freya: chop tree");
+      assertTrue(response.toLowerCase().contains("you cut down"),"");
+      response = sendCommandToServer("simon: get log");
+      assertTrue(response.toLowerCase().contains("you picked up"),"");
+      response = sendCommandToServer("freya: get log");
+      assertFalse(response.toLowerCase().contains("you picked up"),"");
+      response = sendCommandToServer("simon: get log");
+      assertFalse(response.toLowerCase().contains("you picked up"),"");
+      response = sendCommandToServer("simon: goto cabin");
+      assertTrue(response.toLowerCase().contains("you are now"),"");
+      response = sendCommandToServer("freya: drink potion");
+      assertFalse(response.toLowerCase().contains("you are already"),"");
+      response = sendCommandToServer("simon: drink potion");
+      assertTrue(response.toLowerCase().contains("you are already"),"");
+      response = sendCommandToServer("simon: unlock with key");
+      assertFalse(response.toLowerCase().contains("you unlock"),"");
+      response = sendCommandToServer("freya: get key");
+      assertTrue(response.toLowerCase().contains("you picked up"),"");
+      response = sendCommandToServer("simon: unlock with key");
+      assertFalse(response.toLowerCase().contains("you unlock"),"");
+      response = sendCommandToServer("freya: goto cabin");
+      assertTrue(response.toLowerCase().contains("you are now"),"");
+      response = sendCommandToServer("freya: unlock with key");
+      assertTrue(response.toLowerCase().contains("you unlock"),"");
+      response = sendCommandToServer("simon: goto cellar");
+      assertTrue(response.toLowerCase().contains("you are now in"),"");
+      response = sendCommandToServer("freya: goto cellar");
+      assertTrue(response.toLowerCase().contains("you are now in"),"");
   }
 }

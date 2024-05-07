@@ -63,7 +63,7 @@ public class Player extends GameEntity{
                 return;
             }
         }
-        throw new GenericException("Error: item does not exist in location for get");
+        throw new GenericException("That item does not exist in location for you to get");
     }
     public void dropItem(GameEntity item) throws GenericException{
         for(int i=inventory.size()-1;i>=0; i--){
@@ -74,7 +74,7 @@ public class Player extends GameEntity{
                 return;
             }
         }
-        throw new GenericException("Error: item does not exist in inventory");
+        throw new GenericException("That item does not exist in your inventory to drop");
     }
     public String getInvAsString(){
         StringBuilder builder = new StringBuilder();

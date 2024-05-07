@@ -79,17 +79,15 @@ public class GameAction{
         }
         return null;
     }
-    public String getAsString(){
-        return builder.toString();
-    }
     public boolean isTrigger(String token){
         for(String string : triggers){
             if(string.equalsIgnoreCase(token)){return true;}
         }
         return false;
     }
-    public void checkEntities(ArrayList<GameEntity> entities,Player player) throws GenericException {
-        if(actionType!=ActionType.nonstandard){return;}
+    public boolean checkEntities(ArrayList<GameEntity> entities,Player player) throws GenericException {
+        if(actionType!=ActionType.nonstandard){return true;}
+        if(entities.isEmpty()){throw new GenericException("What would you like to do that with?");}
         for(GameEntity entity : entities){
             boolean hasAppeared=false;
             for(GameEntity subject : subjects) {
@@ -97,16 +95,13 @@ public class GameAction{
                     hasAppeared = true;
                 }
             }
-            if (!hasAppeared) {
-                throw new GenericException("Error: specified entity appears in the scope of an action not currently triggered");
-            }
+            if (!hasAppeared) {return false;}
         }
         for(GameEntity subject : subjects){
-            boolean isHere = false;
-            isHere = isHere || player.containsSubject(subject);
-            isHere = isHere || player.getLocation().containsSubject(subject);
-            if(!isHere){throw new GenericException("You do not have everything you need to do that here.");}
+            boolean isHere = player.containsSubject(subject) || player.getLocation().containsSubject(subject);
+            if(!isHere){return false;}
         }
+        return true;
     }
     public void setActionLook(){
         actionType = ActionType.look;
@@ -181,7 +176,7 @@ public class GameAction{
         storeRoom.add(consumed);
     }
     private void processGoTo(Player player ,ArrayList<GameEntity> specifiedEntities) throws GenericException {
-       if(specifiedEntities.size()!=1){throw new GenericException("Error: only one entity can be specified in a goto");}
+       if(specifiedEntities.size()!=1){throw new GenericException("You may only go to one place at a time");}
        for(Location location : player.getLocation().getDestinations()){
            if(location.equals(specifiedEntities.get(0))){
                player.setLocation(location);
@@ -189,16 +184,16 @@ public class GameAction{
                return;
            }
        }
-       throw new GenericException("Error: you cannot get there from here");
+       throw new GenericException("You cannot get there from here");
     }
     private void processGet(Player player ,ArrayList<GameEntity> specifiedEntities)throws GenericException{
-        if(specifiedEntities.size()!=1){throw new GenericException("Error: only one entity can be specified in a get");}
+        if(specifiedEntities.size()!=1){throw new GenericException("You may only get one thing at a time");}
         player.getItem(specifiedEntities.get(0));
         player.getLocation().remove(specifiedEntities.get(0));
         narration = "You picked up the " + specifiedEntities.get(0).getName();
     }
     private void processDrop(Player player ,ArrayList<GameEntity> specifiedEntities) throws GenericException {
-        if(specifiedEntities.size()!=1){throw new GenericException("Error: only one entity can be specified in a drop");}
+        if(specifiedEntities.size()!=1){throw new GenericException("You may only drop one thing at a time");}
         player.dropItem(specifiedEntities.get(0));
         narration = "You dropped up the " + specifiedEntities.get(0).getName();
     }
