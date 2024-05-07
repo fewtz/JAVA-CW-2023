@@ -7,19 +7,22 @@ import edu.uob.engine.entities.Player;
 import edu.uob.utilities.GenericException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.function.Predicate;
 
 public class Interpreter {
     ArrayList<Player> players;
     ArrayList<Location> locations;
-    ArrayList<GameAction> possibleActions;
-    ArrayList<GameAction> currentActions;
+    HashMap<String, HashSet<GameAction>> possibleActions;
+    HashSet<GameAction> currentActions;
     ArrayList<GameEntity> allEntities;
     ArrayList<GameEntity> specifiedEntities;
     Player player = null;
     String playerName;
 
     public Interpreter(ArrayList<Player> playersInput, ArrayList<Location> locationsInput,
-                       ArrayList<GameAction> possibleActionsInput, ArrayList<GameEntity> entitiesInput){
+                       HashMap<String, HashSet<GameAction>> possibleActionsInput, ArrayList<GameEntity> entitiesInput){
         players = playersInput;
         locations = locationsInput;
         possibleActions = possibleActionsInput;
@@ -43,16 +46,11 @@ public class Interpreter {
         createNewPlayer();
     }
     private void searchTriggerPhrase(ArrayList<String> tokens) throws GenericException {
-        currentActions = new ArrayList<>();
-        for(String token : tokens){
-            for(GameAction possibleAction : possibleActions){
-                if(possibleAction.isTrigger(token)){
-                    boolean alreadyFoundAction = false;
-                    for(GameAction otherAction  :currentActions){
-                        if(otherAction.equals(possibleAction)){alreadyFoundAction=true;}
-                    }
-                    if(!alreadyFoundAction){currentActions.add(possibleAction);}
-                }
+        currentActions = new HashSet<GameAction>();
+        for(String token : tokens) {
+            HashSet<GameAction> returnedSet = possibleActions.get(token);
+            if (returnedSet!=null){
+                currentActions.addAll(possibleActions.get(token));
             }
         }
         if(currentActions.isEmpty()){throw new GenericException("What do you do?");}
@@ -68,17 +66,14 @@ public class Interpreter {
         }
     }
     private void checkConsistentEntities() throws GenericException {
-        for(int i=currentActions.size()-1;i>=0;i--){
-            GameAction action = currentActions.get(i);
-            if(!action.checkEntities(specifiedEntities,player)){
-                currentActions.remove(action);
-            }
-        }
-        if(currentActions.isEmpty()){throw new GenericException("What would you like to do that with?");}
+        Predicate<GameAction> condition = action -> !action.checkEntities(specifiedEntities,player);;
+        currentActions.removeIf(condition);
+        for(GameAction action : currentActions){action.checkNoEntities(specifiedEntities);}
+        if(currentActions.isEmpty()){throw new GenericException("What do you do?");}
         if(currentActions.size()>1){throw new GenericException("That was ambiguous - what do you do?");}
     }
     private String executeAction( ) throws GenericException {
-        return currentActions.get(0).execute(player,players,specifiedEntities);
+        return currentActions.stream().toList().get(0).execute(player,players,specifiedEntities);
     }
     private void createNewPlayer(){
         player = new Player(playerName,"You",null,locations.get(0));
@@ -117,7 +112,7 @@ public class Interpreter {
                     break;
                 default :
                     if(Character.isAlphabetic(character)) {
-                        builder.append(character);
+                        builder.append(Character.toLowerCase(character));
                     }
             }
         }

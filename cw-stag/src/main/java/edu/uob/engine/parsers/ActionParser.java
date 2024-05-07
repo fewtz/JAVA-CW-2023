@@ -1,6 +1,8 @@
 package edu.uob.engine.parsers;
 import edu.uob.engine.GameAction;
 
+import java.util.HashSet;
+import java.util.HashMap;
 import java.util.ArrayList;
 import java.io.IOException;
 import java.io.File;
@@ -24,16 +26,17 @@ public class ActionParser extends ParserFramework {
         storeRoom = storeRoomInput;
         locations = locationsInput;
     }
-    public ArrayList<GameAction> parse(File actionFile, ArrayList<GameEntity> entities) throws GenericException {
+    public HashMap<String,HashSet<GameAction>> parse(File actionFile, ArrayList<GameEntity> entities) throws GenericException {
         allEntities = entities;
 
         NodeList actions = extractActions(actionFile);
 
-        ArrayList<GameAction> actionList = new ArrayList<>();
+        HashMap<String,HashSet<GameAction>> actionList = new HashMap<String, HashSet<GameAction>>();
+
         for(int i=0; i<actions.getLength();i++){
             if(i%2!=0){
                 Element action = (Element) actions.item(i);
-                actionList.add(extractAction(action));
+                GameAction newAction = extractAction(action, actionList);
             }
         }
         return actionList;
@@ -55,8 +58,8 @@ public class ActionParser extends ParserFramework {
         return root.getChildNodes();
     }
 
-    private GameAction extractAction(Element action) throws GenericException {
-        GameAction newAction = new GameAction(allEntities,storeRoom,locations);
+    private GameAction extractAction(Element action, HashMap<String,HashSet<GameAction>> actionList) throws GenericException {
+        GameAction newAction = new GameAction(allEntities,storeRoom,locations, actionList);
         newAction.setTriggers((Element)action.getElementsByTagName("triggers").item(0));
         newAction.setSubjects((Element)action.getElementsByTagName("subjects").item(0));
         newAction.setConsumed((Element)action.getElementsByTagName("consumed").item(0));

@@ -8,22 +8,28 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+
 public class GameAction{
     private ArrayList<GameEntity> allEntities;
     private ArrayList<String> triggers = new ArrayList<>();
     private ArrayList<GameEntity> subjects = new ArrayList<>();
-    private GameEntity consumed=null;
-    private GameEntity produced=null;
+    private ArrayList<GameEntity> consumed= new ArrayList<>();
+    private ArrayList<GameEntity> produced= new ArrayList<>();
     private String narration;
     private ActionType actionType=ActionType.nonstandard;
-    private StringBuilder builder= new StringBuilder();
+    private StringBuilder builder = new StringBuilder();
     private Location storeRoom;
     private ArrayList<Location> locations;
+    HashMap<String,HashSet<GameAction>> actionList;
 
-    public GameAction(ArrayList<GameEntity> entitiesInput, Location storeRoomInput,ArrayList<Location> locationsInput ){
+    public GameAction(ArrayList<GameEntity> entitiesInput, Location storeRoomInput,
+                      ArrayList<Location> locationsInput, HashMap<String, HashSet<GameAction>> actionListInput ){
         allEntities = entitiesInput;
         storeRoom = storeRoomInput;
         locations = locationsInput;
+        actionList = actionListInput;
     }
     public void setTriggers(Element input) throws GenericException {
         NodeList phrases = input.getElementsByTagName("keyphrase");
@@ -33,40 +39,44 @@ public class GameAction{
             if(triggerPhrase!=null){
                 triggers.add(triggerPhrase);
                 builder.append(triggerPhrase + " ");
+                addToMap(triggerPhrase);
             }
         }
-        if(triggers.size()==0){throw new GenericException("Error: No triggers found in action specification");}
+        //if(triggers.size()==0){throw new GenericException("Error: No triggers found in action specification");}
     }
-    public void setSubjects(Element input){
+    private void addToMap(String triggerPhrase) {
+        if (actionList.containsKey(triggerPhrase)) {
+            actionList.get(triggerPhrase).add(this);
+        } else {
+            HashSet<GameAction> newActionSet = new HashSet<>();
+            newActionSet.add(this);
+            actionList.put(triggerPhrase, newActionSet);
+        }
+    }
+    public void setSubjects(Element input) throws GenericException {
         NodeList subjectsNode = input.getElementsByTagName("entity");
         builder.append("subject: ");
-        for(int i=0; i< subjectsNode.getLength() ; i++ ){
-            String subjectName = subjectsNode.item(i).getTextContent();
-            GameEntity subjectEntity = entitySearch(subjectName);
-            if(subjectEntity!=null){
-                subjects.add(subjectEntity);
-                builder.append(subjectName+" ");
-            }
-        }
+        extractEntity(input,subjects);
         //if(subjects.size()==0){throw new GenericException("Error: No subjects for action");}  does this hold true?
     }
     public void setConsumed(Element input) throws GenericException {
         builder.append("consumed: ");
-        consumed = extractEntity(input);
+        extractEntity(input,consumed);
     }
     public void setProduced(Element input) throws GenericException {
         builder.append("produced: ");
-        produced = extractEntity(input);
+        extractEntity(input,produced);
     }
-    private GameEntity extractEntity(Element input) throws GenericException {
+    private void extractEntity(Element input, ArrayList<GameEntity> outputList) throws GenericException {
         NodeList phrases = input.getElementsByTagName("entity");
-        if(phrases.getLength()==0){return null;} //again, can this be 0?
-        String entityName = phrases.item(0).getTextContent();
-        GameEntity entity = entitySearch(entityName);
-        if(entity==null){throw new GenericException("Error: unknown entity in action initiation");}//
-
-        builder.append(entityName+" ");
-        return entity;
+        for(int i=0; i< phrases.getLength() ; i++ ) {
+            String entityName = phrases.item(i).getTextContent();
+            GameEntity entity = entitySearch(entityName);
+            if (entity != null) {
+                outputList.add(entity);
+                builder.append(entityName + " ");
+            }
+        }
     }
     public void setNarration(Element input){
         builder.append("narration: ");
@@ -85,9 +95,13 @@ public class GameAction{
         }
         return false;
     }
-    public boolean checkEntities(ArrayList<GameEntity> entities,Player player) throws GenericException {
+    public void checkNoEntities(ArrayList<GameEntity> entities) throws GenericException {
+        if(actionType==ActionType.nonstandard && entities.isEmpty()){
+            throw new GenericException("What would you like to do that with?");
+        }
+    }
+    public boolean checkEntities(ArrayList<GameEntity> entities,Player player){
         if(actionType!=ActionType.nonstandard){return true;}
-        if(entities.isEmpty()){throw new GenericException("What would you like to do that with?");}
         for(GameEntity entity : entities){
             boolean hasAppeared=false;
             for(GameEntity subject : subjects) {
@@ -106,27 +120,34 @@ public class GameAction{
     public void setActionLook(){
         actionType = ActionType.look;
         triggers.add("look");
+        addToMap("look");
     }
     public void setActionGet(){
         actionType = ActionType.get;
         triggers.add("get");
+        addToMap("get");
     }
     public void setActionDrop(){
         actionType = ActionType.drop;
         triggers.add("drop");
+        addToMap("drop");
     }
     public void setActionInv(){
         actionType = ActionType.inv;
         triggers.add("inv");
+        addToMap("inv");
         triggers.add("inventory");
+        addToMap("inventory");
     }
     public void setActionGoTo(){
         actionType = ActionType.goTo;
         triggers.add("goto");
+        addToMap("goto");
     }
     public void setActionHealth(){
         actionType=ActionType.health;
         triggers.add("health");
+        addToMap("health");
     }
     public void setActionTypeNonstandard(){
         actionType = ActionType.nonstandard;
@@ -135,13 +156,13 @@ public class GameAction{
     public String execute(Player player,ArrayList<Player> players, ArrayList<GameEntity> specifiedEntities) throws GenericException {
         switch(actionType){
             case nonstandard:
-                if(consumed!=null) {
-                    consumeItem(player);
+                for(GameEntity consumedItem : consumed) {
+                    consumeItem(player,consumedItem);
                 }
-                if(produced!=null) {
-                    player.getLocation().add(produced);
-                    if(produced.getName().equals("health")){player.add(produced);}
-                    if(!storeRoom.remove(produced)){throw new GenericException("Something strange happened in the storeroom..");}
+                for(GameEntity producedItem : produced) {
+                    player.getLocation().add(producedItem);
+                    if(producedItem.getName().equals("health")){player.add(producedItem);}
+                    if(!storeRoom.remove(producedItem)){throw new GenericException("Something strange happened in the storeroom..");}
                 }
                 break;
             case goTo:
@@ -167,13 +188,13 @@ public class GameAction{
         }
         return narration;
     }
-    private void consumeItem(Player player) throws GenericException {
-        boolean isRemoved = player.remove(consumed);
+    private void consumeItem(Player player, GameEntity consumedItem) throws GenericException {
+        boolean isRemoved = player.remove(consumedItem);
         for(Location location : locations){
-            isRemoved = isRemoved|| location.remove(consumed);
+            isRemoved = isRemoved|| location.remove(consumedItem);
         }
         if(!isRemoved){throw new GenericException("A consumption item does not exist");}
-        storeRoom.add(consumed);
+        storeRoom.add(consumedItem);
     }
     private void processGoTo(Player player ,ArrayList<GameEntity> specifiedEntities) throws GenericException {
        if(specifiedEntities.size()!=1){throw new GenericException("You may only go to one place at a time");}
@@ -235,4 +256,3 @@ enum ActionType {
     health,
     nonstandard
 }
-

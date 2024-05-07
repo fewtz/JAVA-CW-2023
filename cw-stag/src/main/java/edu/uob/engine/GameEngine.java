@@ -9,9 +9,12 @@ import edu.uob.engine.entities.GameEntity;
 import edu.uob.engine.parsers.*;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+
 public class GameEngine {
     ArrayList<Location> locations;
-    ArrayList<GameAction> possibleActions;
+    HashMap<String, HashSet<GameAction>> possibleActions;
     EntityParser entityParser = new EntityParser();
     ActionParser actionParser;
     ArrayList<GameEntity> allEntities = new ArrayList<>();
@@ -33,23 +36,17 @@ public class GameEngine {
         allEntities.add(new Health("health","The source of your vitality",null));
     }
     private void setupStandardActions(Location storeRoom){
-        GameAction look = new GameAction(allEntities,storeRoom,locations);
+        GameAction look = new GameAction(allEntities,storeRoom,locations,possibleActions);
         look.setActionLook();
-        possibleActions.add(look);
-        GameAction inv = new GameAction(allEntities,storeRoom,locations);
+        GameAction inv = new GameAction(allEntities,storeRoom,locations,possibleActions);
         inv.setActionInv();
-        possibleActions.add(inv);
-        GameAction get = new GameAction(allEntities,storeRoom,locations);
+        GameAction get = new GameAction(allEntities,storeRoom,locations,possibleActions);
         get.setActionGet();
-        possibleActions.add(get);
-        GameAction drop = new GameAction(allEntities,storeRoom,locations);
+        GameAction drop = new GameAction(allEntities,storeRoom,locations,possibleActions);
         drop.setActionDrop();
-        possibleActions.add(drop);
-        GameAction goTo = new GameAction(allEntities,storeRoom,locations);
+        GameAction goTo = new GameAction(allEntities,storeRoom,locations,possibleActions);
         goTo.setActionGoTo();
-        possibleActions.add(goTo);
-        GameAction health = new GameAction(allEntities,storeRoom,locations);
+        GameAction health = new GameAction(allEntities,storeRoom,locations,possibleActions);
         health.setActionHealth();
-        possibleActions.add(health);
     }
 }
