@@ -160,9 +160,7 @@ public class GameAction{
                     consumeItem(player,consumedItem);
                 }
                 for(GameEntity producedItem : produced) {
-                    player.getLocation().add(producedItem);
-                    if(producedItem.getName().equals("health")){player.add(producedItem);}
-                    if(!storeRoom.remove(producedItem)){throw new GenericException("Something strange happened in the storeroom..");}
+                    produceItem(player, producedItem);
                 }
                 break;
             case goTo:
@@ -188,10 +186,28 @@ public class GameAction{
         }
         return narration;
     }
-    private void consumeItem(Player player, GameEntity consumedItem) throws GenericException {
-        boolean isRemoved = player.remove(consumedItem);
+    private void produceItem(Player player, GameEntity producedItem) throws GenericException {
+        boolean hasBeenFound = false;
+        if(producedItem.getName().equals("health")){player.add(producedItem);return;}
         for(Location location : locations){
-            isRemoved = isRemoved|| location.remove(consumedItem);
+            if(producedItem.getClass()== Location.class){hasBeenFound=true;break;}
+            if(location.containsSubject(producedItem)){
+                hasBeenFound = location.remove(producedItem);
+                break;
+            }
+        }
+        if(!hasBeenFound){throw new GenericException("The produced item could not be found, how peculiar..");}
+        player.getLocation().add(producedItem);
+    }
+    private void consumeItem(Player player, GameEntity consumedItem) throws GenericException {
+        boolean isRemoved = false;
+        if(consumedItem.getName().equals("health")){player.remove(consumedItem);return;}
+        for(Location location : locations){
+            if(location.containsSubject(consumedItem)){
+                isRemoved = isRemoved ||location.remove(consumedItem);
+                break;
+            }
+            isRemoved = isRemoved || player.remove(consumedItem);
         }
         if(!isRemoved){throw new GenericException("A consumption item does not exist");}
         storeRoom.add(consumedItem);

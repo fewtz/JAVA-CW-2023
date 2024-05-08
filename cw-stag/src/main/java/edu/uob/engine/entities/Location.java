@@ -122,7 +122,9 @@ public class Location extends GameEntity {
         }else if(item.getClass() == Character.class){
             characters.add((Character) item);
         } else if(item.getClass() == Location.class) {
-            destinations.add((Location) item);
+            if(!destinations.contains((Location)item)){
+                destinations.add((Location)item);
+            }
         }
     }
 }
