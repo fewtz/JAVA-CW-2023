@@ -22,7 +22,7 @@ public class GameAction{
     private StringBuilder builder = new StringBuilder();
     private Location storeRoom;
     private ArrayList<Location> locations;
-    HashMap<String,HashSet<GameAction>> actionList;
+    private HashMap<String,HashSet<GameAction>> actionList;
 
     public GameAction(ArrayList<GameEntity> entitiesInput, Location storeRoomInput,
                       ArrayList<Location> locationsInput, HashMap<String, HashSet<GameAction>> actionListInput ){
@@ -42,7 +42,6 @@ public class GameAction{
                 addToMap(triggerPhrase);
             }
         }
-        //if(triggers.size()==0){throw new GenericException("Error: No triggers found in action specification");}
     }
     private void addToMap(String triggerPhrase) {
         if (actionList.containsKey(triggerPhrase)) {
@@ -57,7 +56,6 @@ public class GameAction{
         NodeList subjectsNode = input.getElementsByTagName("entity");
         builder.append("subject: ");
         extractEntity(input,subjects);
-        //if(subjects.size()==0){throw new GenericException("Error: No subjects for action");}  does this hold true?
     }
     public void setConsumed(Element input) throws GenericException {
         builder.append("consumed: ");
@@ -67,7 +65,7 @@ public class GameAction{
         builder.append("produced: ");
         extractEntity(input,produced);
     }
-    private void extractEntity(Element input, ArrayList<GameEntity> outputList) throws GenericException {
+    private void extractEntity(Element input, ArrayList<GameEntity> outputList){
         NodeList phrases = input.getElementsByTagName("entity");
         for(int i=0; i< phrases.getLength() ; i++ ) {
             String entityName = phrases.item(i).getTextContent();
@@ -88,12 +86,6 @@ public class GameAction{
             if(entity.getName().equals(input)){return entity;}
         }
         return null;
-    }
-    public boolean isTrigger(String token){
-        for(String string : triggers){
-            if(string.equalsIgnoreCase(token)){return true;}
-        }
-        return false;
     }
     public void checkNoEntities(ArrayList<GameEntity> entities) throws GenericException {
         if(actionType==ActionType.nonstandard && entities.isEmpty()){
@@ -173,12 +165,15 @@ public class GameAction{
                 processDrop(player,specifiedEntities);
                 break;
             case inv:
+                if(!specifiedEntities.isEmpty()){throw new GenericException("What do you do?");}
                 processInv(player);
                 break;
             case look:
+                if(!specifiedEntities.isEmpty()){throw new GenericException("What do you do?");}
                 processLook(player,players);
                 break;
             case health:
+                if(specifiedEntities.size()!=1){throw new GenericException("What do you do?");}
                 processHealth(player);
                 break;
             default:
@@ -202,6 +197,10 @@ public class GameAction{
     private void consumeItem(Player player, GameEntity consumedItem) throws GenericException {
         boolean isRemoved = false;
         if(consumedItem.getName().equals("health")){player.remove(consumedItem);return;}
+        if(consumedItem.getClass()== Location.class){
+            if(!player.getLocation().remove(consumedItem)){throw new GenericException("What do you do?");}
+            return;
+        }
         for(Location location : locations){
             if(location.containsSubject(consumedItem)){
                 isRemoved = isRemoved ||location.remove(consumedItem);
@@ -250,7 +249,8 @@ public class GameAction{
         return others;
     }
     private void processLook(Player player,ArrayList<Player> players){
-        narration = "You look around "+player.getLocation().getDescription() +" and see:\n"+ player.getLocation().getLocationContentsAsString();
+        narration = "You look around "+player.getLocation().getDescription()
+                +" and see:\n"+ player.getLocation().getLocationContentsAsString();
         ArrayList<Player> othersHere = getOtherPlayersHere(player,players);
         if(othersHere.size()==1){
             narration+= "You also see a human named:\n"+othersHere.get(0).getName()+"\n";

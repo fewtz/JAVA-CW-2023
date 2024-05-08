@@ -8,11 +8,11 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class Location extends GameEntity {
-    ArrayList<Artefact> artefacts = new ArrayList<>();
-    ArrayList<Furniture> furnitures = new ArrayList<>();
-    ArrayList<Character> characters = new ArrayList<>();
-    ArrayList<Location> destinations = new ArrayList<>();
-    StringBuilder builder = new StringBuilder();
+    private ArrayList<Artefact> artefacts = new ArrayList<>();
+    private ArrayList<Furniture> furnitures = new ArrayList<>();
+    private ArrayList<Character> characters = new ArrayList<>();
+    private ArrayList<Location> destinations = new ArrayList<>();
+    private StringBuilder builder = new StringBuilder();
     public Location(String name, String description, Graph graphInput){
         super(name,description,graphInput);
         builder.append(name+ " ");
@@ -24,7 +24,6 @@ public class Location extends GameEntity {
     private void extractSubGraphs(ArrayList<Graph> graphs){
         for(Graph graph : graphs){
             String phrase = graph.getId().getId();
-
             switch (phrase) {
                 case "furniture" -> {
                     extractFurniture(graph);
@@ -71,9 +70,6 @@ public class Location extends GameEntity {
         allEntities.addAll(furnitures);
         allEntities.addAll(characters);
     }
-    public String getAsString(){
-        return builder.toString();
-    }
     public ArrayList<Location> getDestinations(){
         return destinations;
     }
@@ -100,19 +96,31 @@ public class Location extends GameEntity {
        }
        return builderForContents.toString();
     }
-    public boolean remove(GameEntity item) throws GenericException {
-        return artefacts.remove(item)|| furnitures.remove(item)||item.getClass()== Location.class||
-                characters.remove(item) || item.getName().equals("health") || removePath(item);
-    }
-    private boolean removePath(GameEntity item){
-        if(item.getClass()== Location.class) {return false;}
-        for (Location location : destinations){
-            if(item.equals(location)){destinations.remove(item);return true;}
+    public boolean remove(GameEntity item){
+        if(item.getClass() == Artefact.class){
+            return artefacts.remove((Artefact) item);
+        }else if(item.getClass() == Furniture.class){
+            return furnitures.remove((Furniture) item);
+        }else if(item.getClass() == Character.class){
+            return characters.remove((Character) item);
+        } else if(item.getClass() == Location.class) {
+            if(destinations.contains((Location)item)){
+                return destinations.remove((Location)item);
+            }
         }
         return false;
     }
     public boolean containsSubject(GameEntity entity){
-        return artefacts.contains(entity)|| furnitures.contains(entity) || characters.contains(entity);
+        if(entity.getClass() == Artefact.class){
+            return artefacts.contains((Artefact) entity);
+        }else if(entity.getClass() == Furniture.class){
+            return furnitures.contains((Furniture) entity);
+        }else if(entity.getClass() == Character.class){
+            return characters.contains((Character) entity);
+        } else if(entity.getClass() == Location.class) {
+            return destinations.contains((Location)entity);
+        }
+        return false;
     }
     public void add(GameEntity item) throws GenericException {
         if(item.getClass() == Artefact.class){

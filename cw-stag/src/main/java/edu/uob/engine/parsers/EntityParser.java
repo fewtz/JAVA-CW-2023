@@ -12,8 +12,8 @@ import edu.uob.engine.entities.Location;
 import java.util.ArrayList;
 import java.io.File;
 public class EntityParser extends ParserFramework{
-    ArrayList<GameEntity> allEntities;
-    ArrayList<Location> locations;
+    private ArrayList<GameEntity> allEntities;
+    private ArrayList<Location> locations;
     public EntityParser(){}
     public ArrayList<Location> parse(File entitiesFile, ArrayList<GameEntity> entities) throws GenericException {
         allEntities = entities;
@@ -26,7 +26,7 @@ public class EntityParser extends ParserFramework{
         Graph wholeDocument = parser.getGraphs().get(0);
         ArrayList<Graph> sections = wholeDocument.getSubgraphs();
         locations = parseLocations(sections.get(0).getSubgraphs());
-        if(locations.size()==0){throw new GenericException("Error: cannot have a game with no locations");}
+        if(locations.isEmpty()){throw new GenericException("Error: cannot have a game with no locations");}
         setupPaths(sections.get(1));
         return locations;
     }

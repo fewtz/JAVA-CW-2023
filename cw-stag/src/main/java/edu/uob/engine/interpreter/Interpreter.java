@@ -12,15 +12,14 @@ import java.util.HashSet;
 import java.util.function.Predicate;
 
 public class Interpreter {
-    ArrayList<Player> players;
-    ArrayList<Location> locations;
-    HashMap<String, HashSet<GameAction>> possibleActions;
-    HashSet<GameAction> currentActions;
-    ArrayList<GameEntity> allEntities;
-    ArrayList<GameEntity> specifiedEntities;
-    Player player = null;
-    String playerName;
-
+    private ArrayList<Player> players;
+    private ArrayList<Location> locations;
+    private HashMap<String, HashSet<GameAction>> possibleActions;
+    private HashSet<GameAction> currentActions;
+    private ArrayList<GameEntity> allEntities;
+    private ArrayList<GameEntity> specifiedEntities;
+    private Player player = null;
+    private String playerName;
     public Interpreter(ArrayList<Player> playersInput, ArrayList<Location> locationsInput,
                        HashMap<String, HashSet<GameAction>> possibleActionsInput, ArrayList<GameEntity> entitiesInput){
         players = playersInput;
@@ -28,7 +27,6 @@ public class Interpreter {
         possibleActions = possibleActionsInput;
         allEntities = entitiesInput;
     }
-
     public String handleCommand(String command) throws GenericException {
         if(command.isEmpty()){return "";}
         command = determinePlayerName(command);
@@ -55,7 +53,7 @@ public class Interpreter {
         }
         if(currentActions.isEmpty()){throw new GenericException("What do you do?");}
     }
-    private void searchEntities(ArrayList<String> tokens) throws GenericException {
+    private void searchEntities(ArrayList<String> tokens){
         specifiedEntities = new ArrayList<>();
         for(String token : tokens){
             for(GameEntity entity : allEntities){

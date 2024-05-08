@@ -19,24 +19,22 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 public class ActionParser extends ParserFramework {
-    ArrayList<GameEntity> allEntities;
-    Location storeRoom;
-    ArrayList<Location> locations;
+    private ArrayList<GameEntity> allEntities;
+    private Location storeRoom;
+    private ArrayList<Location> locations;
     public ActionParser(Location storeRoomInput,ArrayList<Location> locationsInput){
         storeRoom = storeRoomInput;
         locations = locationsInput;
     }
-    public HashMap<String,HashSet<GameAction>> parse(File actionFile, ArrayList<GameEntity> entities) throws GenericException {
+    public HashMap<String,HashSet<GameAction>> parse(File actionFile,
+                                                     ArrayList<GameEntity> entities) throws GenericException {
         allEntities = entities;
-
         NodeList actions = extractActions(actionFile);
-
         HashMap<String,HashSet<GameAction>> actionList = new HashMap<String, HashSet<GameAction>>();
-
         for(int i=0; i<actions.getLength();i++){
             if(i%2!=0){
                 Element action = (Element) actions.item(i);
-                GameAction newAction = extractAction(action, actionList);
+                extractAction(action, actionList);
             }
         }
         return actionList;
@@ -58,7 +56,8 @@ public class ActionParser extends ParserFramework {
         return root.getChildNodes();
     }
 
-    private GameAction extractAction(Element action, HashMap<String,HashSet<GameAction>> actionList) throws GenericException {
+    private GameAction extractAction(Element action, HashMap<String,
+            HashSet<GameAction>> actionList) throws GenericException {
         GameAction newAction = new GameAction(allEntities,storeRoom,locations, actionList);
         newAction.setTriggers((Element)action.getElementsByTagName("triggers").item(0));
         newAction.setSubjects((Element)action.getElementsByTagName("subjects").item(0));

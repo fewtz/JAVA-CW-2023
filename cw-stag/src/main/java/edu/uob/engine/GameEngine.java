@@ -13,13 +13,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class GameEngine {
-    ArrayList<Location> locations;
-    HashMap<String, HashSet<GameAction>> possibleActions;
-    EntityParser entityParser = new EntityParser();
-    ActionParser actionParser;
-    ArrayList<GameEntity> allEntities = new ArrayList<>();
-    ArrayList<Player> players = new ArrayList<Player>();
-    Interpreter interpreter;
+    private ArrayList<Location> locations;
+    private HashMap<String, HashSet<GameAction>> possibleActions;
+    private EntityParser entityParser = new EntityParser();
+    private ActionParser actionParser;
+    private ArrayList<GameEntity> allEntities = new ArrayList<>();
+    private ArrayList<Player> players = new ArrayList<Player>();
+    private Interpreter interpreter;
     public GameEngine(File entitiesFile, File actionsFile) throws GenericException {
         locations =  entityParser.parse(entitiesFile, allEntities);
         Location storeRoom = locations.get(locations.size()-1);

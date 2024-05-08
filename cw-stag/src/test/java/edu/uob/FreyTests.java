@@ -40,6 +40,13 @@ public class FreyTests {
         assertTrue(response.toLowerCase().contains("you unlock"),"");
         response = sendCommandToServer("simon: look");
         assertFalse(response.toLowerCase().contains("cellar\ncellar"),"");
-
+        response = sendCommandToServer("simon: goto forest");
+        assertTrue(response.toLowerCase().contains("you are now"),"");
+        response = sendCommandToServer("simon: goto riverbank");
+        assertTrue(response.toLowerCase().contains("you are now"),"");
+        response = sendCommandToServer("simon: blow horn");
+        assertTrue(response.toLowerCase().contains("earthquake"),response);
+        response = sendCommandToServer("simon: blow horn");
+        assertFalse(response.toLowerCase().contains("earthquake"),"");
     }
 }

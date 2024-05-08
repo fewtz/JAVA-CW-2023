@@ -167,6 +167,10 @@ class ExampleSTAGTests {
       assertFalse(response.toLowerCase().contains("you cut down"),"");
       response = sendCommandToServer("simon: chop tree cut axe drink");
       assertTrue(response.toLowerCase().contains("you cut down"),"");
+      response =sendCommandToServer("simon: look ");
+      assertTrue(response.toLowerCase().contains("you look"));
+      response =sendCommandToServer("simon: look at the key");
+      assertFalse(response.toLowerCase().contains("you look"));
   }
   @Test
   void weirdOne(){

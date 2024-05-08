@@ -129,11 +129,11 @@
             <entity>horn</entity>
         </subjects>
         <consumed>
+            <entity>forest</entity>
         </consumed>
         <produced>
-            <entity>lumberjack</entity>
         </produced>
-        <narration>You blow the horn and as if by magic, a lumberjack appears !</narration>
+        <narration>an earthquake cuts off your route to the forest!</narration>
     </action>
 
 </actions>
